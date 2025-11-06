@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     loadUserData();
     renderRewards();
+    checkLoginStatus();
 });
 
 // Render Menu
@@ -398,29 +399,7 @@ function setupEventListeners() {
 
 // Setup Modal Listeners
 function setupModalListeners() {
-    const signInModal = document.getElementById('signInModal');
-    const signUpModal = document.getElementById('signUpModal');
     const paymentModal = document.getElementById('paymentModal');
-
-    // Sign In
-    document.getElementById('signInBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        signInModal.style.display = 'block';
-    });
-
-    // Sign Up Link
-    document.getElementById('signUpLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        signInModal.style.display = 'none';
-        signUpModal.style.display = 'block';
-    });
-
-    // Sign In Link
-    document.getElementById('signInLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        signUpModal.style.display = 'none';
-        signInModal.style.display = 'block';
-    });
 
     // Close buttons
     document.querySelectorAll('.close').forEach(closeBtn => {
@@ -434,18 +413,6 @@ function setupModalListeners() {
         if (e.target.classList.contains('modal')) {
             e.target.style.display = 'none';
         }
-    });
-
-    // Sign In Form
-    document.getElementById('signInForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleSignIn();
-    });
-
-    // Sign Up Form
-    document.getElementById('signUpForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleSignUp();
     });
 
     // Payment Form
@@ -481,104 +448,85 @@ function setupModalListeners() {
     });
 }
 
-// Handle Sign In
-function handleSignIn() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    // Check if it's an admin account
-    const adminAccounts = {
-        'admin@coffeehouse.com': {
-            password: 'admin123',
-            role: 'Super Admin',
-            name: 'Administrator',
-            username: 'admin'
-        },
-        'manager@coffeehouse.com': {
-            password: 'manager123',
-            role: 'Manager',
-            name: 'Store Manager',
-            username: 'manager'
-        },
-        'staff@coffeehouse.com': {
-            password: 'staff123',
-            role: 'Staff',
-            name: 'Staff Member',
-            username: 'staff'
-        }
-    };
-
-    // Check if login is admin
-    if (adminAccounts[email] && adminAccounts[email].password === password) {
-        // Admin login - redirect to admin dashboard
-        const adminSession = {
-            username: adminAccounts[email].username,
-            role: adminAccounts[email].role,
-            name: adminAccounts[email].name,
-            email: email,
-            loginTime: new Date().toISOString()
-        };
-        
-        localStorage.setItem('adminSession', JSON.stringify(adminSession));
-        document.getElementById('signInModal').style.display = 'none';
-        showNotification('Admin login successful! Redirecting to dashboard...');
-        
-        setTimeout(() => {
-            window.location.href = 'admin.html';
-        }, 1500);
-        return;
-    }
-
-    // Regular user login
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-
-    if (user) {
-        currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        loadUserData();
-        document.getElementById('signInModal').style.display = 'none';
-        document.getElementById('signInBtn').textContent = `Hi, ${user.name}`;
-        showNotification('Welcome back!');
-    } else {
-        showNotification('Invalid credentials!');
-    }
-}
-
-// Handle Sign Up
-function handleSignUp() {
-    const name = document.getElementById('signUpName').value;
-    const email = document.getElementById('signUpEmail').value;
-    const password = document.getElementById('signUpPassword').value;
-
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    if (users.find(u => u.email === email)) {
-        showNotification('Email already exists!');
-        return;
-    }
-
-    const newUser = { name, email, password, points: 0 };
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    currentUser = newUser;
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    loadUserData();
-
-    document.getElementById('signUpModal').style.display = 'none';
-    document.getElementById('signInBtn').textContent = `Hi, ${name}`;
-    showNotification('Account created successfully!');
-}
-
 // Load User Data
 function loadUserData() {
-    const savedUser = localStorage.getItem('currentUser');
+    const savedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
         userPoints = currentUser.points || 0;
         document.getElementById('userPoints').textContent = userPoints;
-        document.getElementById('signInBtn').textContent = `Hi, ${currentUser.name}`;
+        
+        const signInBtn = document.getElementById('signInBtn');
+        signInBtn.textContent = `Hi, ${currentUser.name}`;
+        signInBtn.href = '#';
+        
+        // Remove old event listeners by cloning
+        const newSignInBtn = signInBtn.cloneNode(true);
+        signInBtn.parentNode.replaceChild(newSignInBtn, signInBtn);
+        
+        // Add new event listener
+        newSignInBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showUserMenu();
+        });
+    }
+}
+
+// Check Login Status
+function checkLoginStatus() {
+    const savedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+    console.log('Checking login status:', savedUser);
+    
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        userPoints = currentUser.points || 0;
+        document.getElementById('userPoints').textContent = userPoints;
+        
+        const signInBtn = document.getElementById('signInBtn');
+        console.log('User logged in:', currentUser.name);
+        signInBtn.textContent = `Hi, ${currentUser.name}`;
+        signInBtn.href = '#';
+        
+        // Remove old event listeners by cloning
+        const newSignInBtn = signInBtn.cloneNode(true);
+        signInBtn.parentNode.replaceChild(newSignInBtn, signInBtn);
+        
+        // Add new event listener
+        newSignInBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showUserMenu();
+        });
+    } else {
+        console.log('No user logged in');
+    }
+}
+
+// Show User Menu
+function showUserMenu() {
+    if (confirm(`Welcome ${currentUser.name}!\n\nDo you want to logout?`)) {
+        localStorage.removeItem('currentUser');
+        sessionStorage.removeItem('currentUser');
+        currentUser = null;
+        userPoints = 0;
+        
+        // Reset sign in button
+        const signInBtn = document.getElementById('signInBtn');
+        signInBtn.textContent = 'Sign In';
+        signInBtn.href = 'admin-login.html';
+        
+        // Remove old event listeners by cloning
+        const newSignInBtn = signInBtn.cloneNode(true);
+        signInBtn.parentNode.replaceChild(newSignInBtn, signInBtn);
+        
+        document.getElementById('userPoints').textContent = '0';
+        showNotification('Logged out successfully!');
+        
+        // Clear cart and rewards
+        cart = [];
+        appliedDiscount = 0;
+        appliedReward = null;
+        updateCart();
+        renderRewards();
     }
 }
 
@@ -662,6 +610,12 @@ function handlePayment() {
 
 // Render Rewards
 function renderRewards() {
+    // Update points display
+    const pointsDisplay = document.querySelector('.points-display .points');
+    if (pointsDisplay) {
+        pointsDisplay.textContent = userPoints;
+    }
+    
     const rewardItems = document.getElementById('rewardItems');
     rewardItems.innerHTML = rewardsData.map(reward => {
         const isApplied = appliedReward && appliedReward.id === reward.id;
@@ -690,7 +644,7 @@ function renderRewards() {
 function redeemReward(rewardId) {
     if (!currentUser) {
         showNotification('Please sign in to redeem rewards!');
-        document.getElementById('signInModal').style.display = 'block';
+        window.location.href = 'admin-login.html';
         return;
     }
 

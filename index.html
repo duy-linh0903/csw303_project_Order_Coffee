@@ -19,7 +19,7 @@
                 <li><a href="#menu" class="nav-link active">Menu</a></li>
                 <li><a href="#order" class="nav-link">Order List</a></li>
                 <li><a href="#rewards" class="nav-link">Rewards</a></li>
-                <li><a href="#" class="nav-link" id="signInBtn">Sign In</a></li>
+                <li><a href="admin-login.html" class="nav-link" id="signInBtn">Sign In</a></li>
             </ul>
             <div class="cart-icon">
                 <i class="fas fa-shopping-cart"></i>
@@ -272,50 +272,6 @@
         </div>
     </section>
 
-    <!-- Sign In Modal -->
-    <div id="signInModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Sign In</h2>
-            <form id="signInForm">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Sign In</button>
-                <p class="form-footer">Don't have an account? <a href="#" id="signUpLink">Sign Up</a></p>
-            </form>
-        </div>
-    </div>
-
-    <!-- Sign Up Modal -->
-    <div id="signUpModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Sign Up</h2>
-            <form id="signUpForm">
-                <div class="form-group">
-                    <label for="signUpName">Full Name</label>
-                    <input type="text" id="signUpName" required>
-                </div>
-                <div class="form-group">
-                    <label for="signUpEmail">Email</label>
-                    <input type="email" id="signUpEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="signUpPassword">Password</label>
-                    <input type="password" id="signUpPassword" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Sign Up</button>
-                <p class="form-footer">Already have an account? <a href="#" id="signInLink">Sign In</a></p>
-            </form>
-        </div>
-    </div>
-
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
@@ -367,7 +323,7 @@
             <p>&copy; 2025 Coffee House. All rights reserved.</p>
             <p style="margin-top: 0.5rem;">
                 <a href="admin-login.html" style="color: var(--secondary-color); text-decoration: none;">
-                    <i class="fas fa-lock"></i> Admin Dashboard
+                    <i class="fas fa-sign-in-alt"></i> Sign In / Sign Up
                 </a>
             </p>
         </div>

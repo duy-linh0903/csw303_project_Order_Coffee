@@ -284,24 +284,24 @@
         <div class="login-left">
             <i class="fas fa-coffee"></i>
             <h1>Coffee House</h1>
-            <p>Admin Dashboard</p>
-            <p style="margin-top: 1rem; font-size: 0.9rem;">Manage your coffee shop with ease</p>
+            <p>Welcome Back!</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Sign in to enjoy your coffee journey</p>
         </div>
 
         <div class="login-right">
             <div class="login-header">
-                <h2>Admin Login</h2>
-                <p>Enter your credentials to access the dashboard</p>
+                <h2>Sign In</h2>
+                <p>Enter your credentials to continue</p>
             </div>
 
             <div id="alertBox" class="alert"></div>
 
             <form id="adminLoginForm">
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username">Email or Username</label>
                     <div class="input-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="username" placeholder="Enter username" required>
+                        <input type="text" id="username" placeholder="Enter email or username" required>
                     </div>
                 </div>
 
@@ -327,16 +327,20 @@
                 </button>
             </form>
 
+            <div class="signup-link" style="text-align: center; margin-top: 1rem; padding: 1rem; background-color: var(--light-color); border-radius: 10px;">
+                <p>Don't have an account? <a href="#" id="showSignupForm" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Sign Up</a></p>
+            </div>
+
             <div class="demo-accounts">
-                <h4><i class="fas fa-info-circle"></i> Demo Accounts:</h4>
+                <h4><i class="fas fa-info-circle"></i> Demo Admin Accounts:</h4>
                 <div class="demo-account">
-                    <strong>Super Admin:</strong> admin / admin123
+                    <strong>Super Admin:</strong> admin@coffeehouse.com / admin123
                 </div>
                 <div class="demo-account">
-                    <strong>Manager:</strong> manager / manager123
+                    <strong>Manager:</strong> manager@coffeehouse.com / manager123
                 </div>
                 <div class="demo-account">
-                    <strong>Staff:</strong> staff / staff123
+                    <strong>Staff:</strong> staff@coffeehouse.com / staff123
                 </div>
             </div>
 
@@ -349,22 +353,43 @@
     </div>
 
     <script>
-        // Admin accounts
+        // Admin accounts - support both email and username
         const adminAccounts = {
             'admin': {
                 password: 'admin123',
                 role: 'Super Admin',
-                name: 'Administrator'
+                name: 'Administrator',
+                email: 'admin@coffeehouse.com'
+            },
+            'admin@coffeehouse.com': {
+                password: 'admin123',
+                role: 'Super Admin',
+                name: 'Administrator',
+                username: 'admin'
             },
             'manager': {
                 password: 'manager123',
                 role: 'Manager',
-                name: 'Store Manager'
+                name: 'Store Manager',
+                email: 'manager@coffeehouse.com'
+            },
+            'manager@coffeehouse.com': {
+                password: 'manager123',
+                role: 'Manager',
+                name: 'Store Manager',
+                username: 'manager'
             },
             'staff': {
                 password: 'staff123',
                 role: 'Staff',
-                name: 'Staff Member'
+                name: 'Staff Member',
+                email: 'staff@coffeehouse.com'
+            },
+            'staff@coffeehouse.com': {
+                password: 'staff123',
+                role: 'Staff',
+                name: 'Staff Member',
+                username: 'staff'
             }
         };
 
@@ -386,11 +411,12 @@
             const rememberMe = document.getElementById('rememberMe').checked;
             const alertBox = document.getElementById('alertBox');
 
-            // Validate credentials
+            // Check if admin account
             if (adminAccounts[username] && adminAccounts[username].password === password) {
                 // Store admin session
                 const adminSession = {
-                    username: username,
+                    username: adminAccounts[username].username || username,
+                    email: adminAccounts[username].email || username,
                     role: adminAccounts[username].role,
                     name: adminAccounts[username].name,
                     loginTime: new Date().toISOString()
@@ -404,7 +430,7 @@
 
                 // Show success message
                 alertBox.className = 'alert alert-success';
-                alertBox.textContent = '✓ Login successful! Redirecting...';
+                alertBox.textContent = '✓ Admin login successful! Redirecting to dashboard...';
                 alertBox.style.display = 'block';
 
                 // Redirect to admin dashboard
@@ -412,26 +438,212 @@
                     window.location.href = 'admin.html';
                 }, 1000);
             } else {
-                // Show error message
-                alertBox.className = 'alert alert-error';
-                alertBox.textContent = '✗ Invalid username or password!';
+                // Check regular user accounts
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const user = users.find(u => (u.email === username || u.username === username) && u.password === password);
+
+                if (user) {
+                    // Store user session
+                    const userSession = {
+                        email: user.email,
+                        name: user.name,
+                        username: user.username || user.email.split('@')[0],
+                        points: user.points || 0,
+                        loginTime: new Date().toISOString()
+                    };
+
+                    if (rememberMe) {
+                        localStorage.setItem('currentUser', JSON.stringify(userSession));
+                    } else {
+                        sessionStorage.setItem('currentUser', JSON.stringify(userSession));
+                    }
+
+                    // Show success message
+                    alertBox.className = 'alert alert-success';
+                    alertBox.textContent = '✓ Login successful! Welcome back!';
+                    alertBox.style.display = 'block';
+
+                    // Redirect to home page
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    // Show error message
+                    alertBox.className = 'alert alert-error';
+                    alertBox.textContent = '✗ Invalid username or password!';
+                    alertBox.style.display = 'block';
+
+                    // Clear password field
+                    document.getElementById('password').value = '';
+
+                    // Hide error after 3 seconds
+                    setTimeout(() => {
+                        alertBox.style.display = 'none';
+                    }, 3000);
+                }
+            }
+        });
+
+        // Show signup form
+        document.getElementById('showSignupForm').addEventListener('click', function(e) {
+            e.preventDefault();
+            const signupHTML = `
+                <div class="login-header">
+                    <h2>Sign Up</h2>
+                    <p>Create your account to start ordering</p>
+                </div>
+
+                <div id="alertBox" class="alert"></div>
+
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="signupName" placeholder="Enter your name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="signupPassword" placeholder="Enter password" required>
+                            <i class="fas fa-eye password-toggle" id="toggleSignupPassword"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="signupConfirmPassword" placeholder="Confirm password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </button>
+                </form>
+
+                <div class="signup-link" style="text-align: center; margin-top: 1rem; padding: 1rem; background-color: var(--light-color); border-radius: 10px;">
+                    <p>Already have an account? <a href="#" id="showLoginForm" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Sign In</a></p>
+                </div>
+
+                <div class="back-home">
+                    <a href="index.html">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </a>
+                </div>
+            `;
+
+            document.querySelector('.login-right').innerHTML = signupHTML;
+
+            // Toggle password visibility for signup
+            document.getElementById('toggleSignupPassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('signupPassword');
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+
+            // Handle signup form
+            document.getElementById('signupForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('signupName').value.trim();
+                const email = document.getElementById('signupEmail').value.trim();
+                const password = document.getElementById('signupPassword').value;
+                const confirmPassword = document.getElementById('signupConfirmPassword').value;
+                const alertBox = document.getElementById('alertBox');
+
+                // Check if email is admin email
+                if (email.includes('admin@') || email.includes('manager@') || email.includes('staff@')) {
+                    alertBox.className = 'alert alert-error';
+                    alertBox.textContent = '✗ This email is reserved for admin accounts!';
+                    alertBox.style.display = 'block';
+                    setTimeout(() => alertBox.style.display = 'none', 3000);
+                    return;
+                }
+
+                // Validate passwords match
+                if (password !== confirmPassword) {
+                    alertBox.className = 'alert alert-error';
+                    alertBox.textContent = '✗ Passwords do not match!';
+                    alertBox.style.display = 'block';
+                    setTimeout(() => alertBox.style.display = 'none', 3000);
+                    return;
+                }
+
+                // Check if user already exists
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                if (users.some(u => u.email === email)) {
+                    alertBox.className = 'alert alert-error';
+                    alertBox.textContent = '✗ Email already registered!';
+                    alertBox.style.display = 'block';
+                    setTimeout(() => alertBox.style.display = 'none', 3000);
+                    return;
+                }
+
+                // Create new user
+                const newUser = {
+                    name: name,
+                    email: email,
+                    username: email.split('@')[0],
+                    password: password,
+                    points: 0,
+                    createdAt: new Date().toISOString()
+                };
+
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+
+                // Auto login
+                const userSession = {
+                    email: newUser.email,
+                    name: newUser.name,
+                    username: newUser.username,
+                    points: 0,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('currentUser', JSON.stringify(userSession));
+
+                // Show success message
+                alertBox.className = 'alert alert-success';
+                alertBox.textContent = '✓ Account created successfully! Redirecting...';
                 alertBox.style.display = 'block';
 
-                // Clear password field
-                document.getElementById('password').value = '';
-
-                // Hide error after 3 seconds
+                // Redirect to home page
                 setTimeout(() => {
-                    alertBox.style.display = 'none';
-                }, 3000);
-            }
+                    window.location.href = 'index.html';
+                }, 1500);
+            });
+
+            // Back to login
+            document.getElementById('showLoginForm').addEventListener('click', function(e) {
+                e.preventDefault();
+                location.reload();
+            });
         });
 
         // Check if already logged in
         window.addEventListener('DOMContentLoaded', function() {
             const adminSession = localStorage.getItem('adminSession') || sessionStorage.getItem('adminSession');
+            const userSession = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            
             if (adminSession) {
                 window.location.href = 'admin.html';
+            } else if (userSession) {
+                window.location.href = 'index.html';
             }
         });
     </script>
