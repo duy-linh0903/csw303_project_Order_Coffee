@@ -486,7 +486,50 @@ function handleSignIn() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    // Simple validation (in real app, this would be server-side)
+    // Check if it's an admin account
+    const adminAccounts = {
+        'admin@coffeehouse.com': {
+            password: 'admin123',
+            role: 'Super Admin',
+            name: 'Administrator',
+            username: 'admin'
+        },
+        'manager@coffeehouse.com': {
+            password: 'manager123',
+            role: 'Manager',
+            name: 'Store Manager',
+            username: 'manager'
+        },
+        'staff@coffeehouse.com': {
+            password: 'staff123',
+            role: 'Staff',
+            name: 'Staff Member',
+            username: 'staff'
+        }
+    };
+
+    // Check if login is admin
+    if (adminAccounts[email] && adminAccounts[email].password === password) {
+        // Admin login - redirect to admin dashboard
+        const adminSession = {
+            username: adminAccounts[email].username,
+            role: adminAccounts[email].role,
+            name: adminAccounts[email].name,
+            email: email,
+            loginTime: new Date().toISOString()
+        };
+        
+        localStorage.setItem('adminSession', JSON.stringify(adminSession));
+        document.getElementById('signInModal').style.display = 'none';
+        showNotification('Admin login successful! Redirecting to dashboard...');
+        
+        setTimeout(() => {
+            window.location.href = 'admin.html';
+        }, 1500);
+        return;
+    }
+
+    // Regular user login
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find(u => u.email === email && u.password === password);
 
@@ -563,8 +606,31 @@ function handlePayment() {
     }
 
     // Process payment
+    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('$', ''));
+    const tax = parseFloat(document.getElementById('tax').textContent.replace('$', ''));
+    const discount = parseFloat(document.getElementById('discount').textContent.replace('-$', ''));
     const total = parseFloat(document.getElementById('total').textContent.replace('$', ''));
     const pointsEarned = Math.floor(total);
+
+    // Create order object for admin
+    const order = {
+        id: 'ORD' + Date.now(),
+        customerName: currentUser ? currentUser.name : 'Guest',
+        customerEmail: currentUser ? currentUser.email : 'guest@example.com',
+        items: JSON.parse(JSON.stringify(cart)), // Deep copy
+        subtotal: subtotal,
+        tax: tax,
+        discount: discount,
+        total: total,
+        status: 'pending',
+        date: new Date().toISOString(),
+        paymentMethod: paymentMethod
+    };
+
+    // Save order to admin orders
+    const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+    adminOrders.push(order);
+    localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
 
     if (currentUser) {
         userPoints += pointsEarned;
@@ -588,7 +654,7 @@ function handlePayment() {
     updateCart();
 
     document.getElementById('paymentModal').style.display = 'none';
-    showNotification(`Payment successful! You earned ${pointsEarned} points!`);
+    showNotification(`Payment successful! Order ${order.id} created. You earned ${pointsEarned} points!`);
     
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
