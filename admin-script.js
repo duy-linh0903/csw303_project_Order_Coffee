@@ -288,8 +288,24 @@ function viewOrder(orderId) {
     orderDetailContent.innerHTML = `
         <div style="display: grid; gap: 1.5rem;">
             <div style="background: var(--light-color); padding: 1.5rem; border-radius: 10px;">
-                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Order #${order.id}</h3>
-                <p><strong>Customer:</strong> ${order.customerName}</p>
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    Order #${order.id}
+                    ${order.isDelivery ? '<span style="background: #4CAF50; color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;"><i class="fas fa-shipping-fast"></i> GIAO HÀNG</span>' : '<span style="background: #2196F3; color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;"><i class="fas fa-store"></i> TẠI QUÁN</span>'}
+                </h3>
+                <p><strong>Customer:</strong> ${order.customerName} ${order.isGuest ? '<span style="background: #ff9800; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px;">GUEST</span>' : ''}</p>
+                ${order.guestInfo ? `
+                    <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+                        <p style="margin: 0.3rem 0;"><strong><i class="fas fa-user"></i> Tên:</strong> ${order.guestInfo.name}</p>
+                        <p style="margin: 0.3rem 0;"><strong><i class="fas fa-phone"></i> SĐT:</strong> ${order.guestInfo.phone}</p>
+                    </div>
+                ` : ''}
+                ${order.deliveryInfo ? `
+                    <div style="margin-top: 1rem; padding: 1rem; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                        <h4 style="color: #2e7d32; margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt"></i> Thông tin giao hàng</h4>
+                        <p style="margin: 0.3rem 0;"><strong>Địa chỉ:</strong> ${order.deliveryInfo.address}</p>
+                        ${order.deliveryInfo.note ? `<p style="margin: 0.3rem 0;"><strong>Ghi chú:</strong> ${order.deliveryInfo.note}</p>` : ''}
+                    </div>
+                ` : ''}
                 <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
                 <p><strong>Status:</strong> <span class="status-badge status-${order.status}">${order.status}</span></p>
             </div>
@@ -327,6 +343,12 @@ function viewOrder(orderId) {
                     <span>Tax (10%):</span>
                     <strong>${formatVND(order.tax)}</strong>
                 </div>
+                ${order.deliveryFee && order.deliveryFee > 0 ? `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Phí giao hàng:</span>
+                        <strong>${formatVND(order.deliveryFee)}</strong>
+                    </div>
+                ` : ''}
                 ${order.discount > 0 ? `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                         <span>Discount:</span>

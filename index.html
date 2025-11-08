@@ -79,6 +79,10 @@
                         <span>Tax (10%):</span>
                         <span id="tax">0₫</span>
                     </div>
+                    <div class="summary-item" id="deliveryFeeRow" style="display: none;">
+                        <span>Phí giao hàng:</span>
+                        <span id="deliveryFee">23.000₫</span>
+                    </div>
                     <div class="summary-item">
                         <span>Discount:</span>
                         <span id="discount">-0₫</span>
@@ -88,7 +92,14 @@
                         <span>Total:</span>
                         <span id="total">0₫</span>
                     </div>
-                    <button class="btn-primary btn-full" id="checkoutBtn">Proceed to Payment</button>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="btn-primary" id="deliveryBtn" style="flex: 1;">
+                            <i class="fas fa-shipping-fast"></i> Giao hàng
+                        </button>
+                        <button class="btn-primary" id="checkoutBtn" style="flex: 1;">
+                            <i class="fas fa-store"></i> Nhận tại quán
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -333,6 +344,66 @@
             </p>
         </div>
     </footer>
+
+    <!-- Guest Info Modal -->
+    <div id="guestInfoModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeGuestInfoModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+                <i class="fas fa-user-circle"></i> Thông tin liên hệ
+            </h2>
+            <p style="color: #666; margin-bottom: 1.5rem;">
+                Vui lòng cung cấp thông tin để chúng tôi liên hệ với bạn
+            </p>
+            <form id="guestInfoForm">
+                <div class="form-group">
+                    <label for="guestName">
+                        <i class="fas fa-user"></i> Họ và tên <span style="color: red;">*</span>
+                    </label>
+                    <input type="text" id="guestName" required placeholder="Nguyễn Văn A">
+                </div>
+                <div class="form-group">
+                    <label for="guestPhone">
+                        <i class="fas fa-phone"></i> Số điện thoại <span style="color: red;">*</span>
+                    </label>
+                    <input type="tel" id="guestPhone" required placeholder="0912345678" pattern="[0-9]{10,11}">
+                </div>
+                <button type="submit" class="btn-primary btn-full">
+                    <i class="fas fa-arrow-right"></i> Tiếp tục
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delivery Address Modal -->
+    <div id="deliveryModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeDeliveryModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+                <i class="fas fa-shipping-fast"></i> Thông tin giao hàng
+            </h2>
+            <p style="color: #666; margin-bottom: 1rem;">
+                Phí giao hàng: <strong style="color: var(--accent-color);">23.000₫</strong>
+            </p>
+            <form id="deliveryForm">
+                <div class="form-group">
+                    <label for="deliveryAddress">
+                        <i class="fas fa-map-marker-alt"></i> Địa chỉ giao hàng <span style="color: red;">*</span>
+                    </label>
+                    <textarea id="deliveryAddress" required placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryNote">
+                        <i class="fas fa-sticky-note"></i> Ghi chú giao hàng (tùy chọn)
+                    </label>
+                    <textarea id="deliveryNote" placeholder="Ghi chú cho người giao hàng..." rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-primary btn-full">
+                    <i class="fas fa-check"></i> Xác nhận giao hàng
+                </button>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

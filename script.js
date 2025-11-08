@@ -45,6 +45,9 @@ let userPoints = 0;
 let appliedDiscount = 0;
 let appliedReward = null;
 let currentOrderItem = null;
+let isDelivery = false;
+let deliveryFee = 23000;
+let deliveryInfo = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -283,11 +286,23 @@ function updateOrderSummary() {
         }
     }
     
-    const total = Math.max(0, subtotal + tax - finalDiscount);
+    // Add delivery fee if delivery is selected
+    const delivery = isDelivery ? deliveryFee : 0;
+    const total = Math.max(0, subtotal + tax + delivery - finalDiscount);
 
     document.getElementById('subtotal').textContent = formatVND(subtotal);
     document.getElementById('tax').textContent = formatVND(tax);
     document.getElementById('discount').textContent = `-${formatVND(finalDiscount)}`;
+    
+    // Show/hide delivery fee
+    const deliveryFeeRow = document.getElementById('deliveryFeeRow');
+    if (isDelivery) {
+        deliveryFeeRow.style.display = 'flex';
+        document.getElementById('deliveryFee').textContent = formatVND(deliveryFee);
+    } else {
+        deliveryFeeRow.style.display = 'none';
+    }
+    
     document.getElementById('total').textContent = formatVND(total);
     
     // Display applied reward
@@ -326,7 +341,18 @@ function setupEventListeners() {
             showNotification('Your cart is empty!');
             return;
         }
+        isDelivery = false;
         openPaymentModal();
+    });
+    
+    // Delivery button
+    document.getElementById('deliveryBtn').addEventListener('click', function() {
+        if (cart.length === 0) {
+            showNotification('Giỏ hàng của bạn đang trống!');
+            return;
+        }
+        isDelivery = true;
+        showDeliveryModal();
     });
 }
 
@@ -443,8 +469,43 @@ function checkLoginStatus() {
             e.preventDefault();
             showUserMenu(e);
         });
+
+        // Restore cart if user came from checkout redirect
+        restorePendingCart();
     } else {
         console.log('No user logged in');
+    }
+}
+
+// Restore Pending Cart after Login
+function restorePendingCart() {
+    const pendingCart = sessionStorage.getItem('pendingCart');
+    const pendingCheckout = sessionStorage.getItem('pendingCheckout');
+    
+    if (pendingCart && pendingCheckout === 'true') {
+        // Restore cart
+        cart = JSON.parse(pendingCart);
+        updateCart();
+        
+        // Clear pending data
+        sessionStorage.removeItem('pendingCart');
+        sessionStorage.removeItem('pendingCheckout');
+        
+        // Show notification
+        showNotification('Đơn hàng của bạn đã được khôi phục! Bạn có thể tiếp tục thanh toán.');
+        
+        // Scroll to cart section
+        document.getElementById('order').scrollIntoView({ behavior: 'smooth' });
+        
+        // Auto open payment modal after a short delay
+        setTimeout(() => {
+            const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+            if (total > 0) {
+                const paymentModal = document.getElementById('paymentModal');
+                document.getElementById('paymentTotal').textContent = formatVND(total);
+                paymentModal.style.display = 'block';
+            }
+        }, 1000);
     }
 }
 
@@ -533,6 +594,202 @@ function logoutUser(event) {
 
 // Open Payment Modal
 function openPaymentModal() {
+    // Check if cart is empty
+    if (cart.length === 0) {
+        showNotification('Your cart is empty!');
+        return;
+    }
+
+    // Check if user is guest
+    if (!currentUser) {
+        showGuestWarningModal();
+        return;
+    }
+
+    const paymentModal = document.getElementById('paymentModal');
+    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+    document.getElementById('paymentTotal').textContent = formatVND(total);
+    paymentModal.style.display = 'block';
+}
+
+// Show Guest Warning Modal
+function showGuestWarningModal() {
+    const modalHTML = `
+        <div id="guestWarningModal" class="modal" style="display: block;">
+            <div class="modal-content" style="max-width: 500px;">
+                <span class="close" onclick="closeGuestWarningModal()">&times;</span>
+                <div style="text-align: center; padding: 1rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 1rem;"></i>
+                    <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Thông báo</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; color: #333;">
+                        Bạn đang thanh toán với tư cách <strong>khách</strong>.<br>
+                        Nếu không đăng nhập, bạn sẽ <strong style="color: #d32f2f;">KHÔNG nhận được</strong>:
+                    </p>
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; margin-bottom: 1.5rem; text-align: left;">
+                        <ul style="margin: 0; padding-left: 1.5rem;">
+                            <li style="margin-bottom: 0.5rem;"><i class="fas fa-times-circle" style="color: #d32f2f;"></i> Điểm thưởng (Points)</li>
+                            <li style="margin-bottom: 0.5rem;"><i class="fas fa-times-circle" style="color: #d32f2f;"></i> Ưu đãi & giảm giá từ Rewards</li>
+                            <li style="margin-bottom: 0.5rem;"><i class="fas fa-times-circle" style="color: #d32f2f;"></i> Lịch sử đơn hàng</li>
+                            <li><i class="fas fa-times-circle" style="color: #d32f2f;"></i> Các ưu đãi đặc biệt</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1rem; margin-bottom: 1.5rem; color: #666;">
+                        <i class="fas fa-info-circle"></i> Đơn hàng của bạn sẽ được lưu lại nếu bạn chọn đăng nhập!
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button onclick="redirectToLoginWithCart()" class="btn-primary" style="flex: 1; max-width: 200px;">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
+                        </button>
+                        <button onclick="continueAsGuest()" class="btn-secondary" style="flex: 1; max-width: 200px; background: #666;">
+                            <i class="fas fa-shopping-cart"></i> Tiếp tục thanh toán
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Close Guest Warning Modal
+function closeGuestWarningModal() {
+    const modal = document.getElementById('guestWarningModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Redirect to Login and Save Cart
+function redirectToLoginWithCart() {
+    // Save current cart to sessionStorage
+    sessionStorage.setItem('pendingCart', JSON.stringify(cart));
+    sessionStorage.setItem('pendingCheckout', 'true');
+    
+    // Close modal
+    closeGuestWarningModal();
+    
+    // Redirect to login page
+    window.location.href = 'admin-login.html?redirect=checkout';
+}
+
+// Continue as Guest
+function continueAsGuest() {
+    closeGuestWarningModal();
+    
+    // Show guest info modal to collect contact information
+    showGuestInfoModal();
+}
+
+// Guest Information Modal
+let guestInfo = null;
+
+function showGuestInfoModal() {
+    const modal = document.getElementById('guestInfoModal');
+    modal.style.display = 'block';
+    
+    // Handle form submission
+    const form = document.getElementById('guestInfoForm');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('guestName').value.trim();
+        const phone = document.getElementById('guestPhone').value.trim();
+        
+        // Validate required fields
+        if (!name || !phone) {
+            showNotification('Vui lòng điền đầy đủ thông tin!');
+            return;
+        }
+        
+        // Validate phone number
+        const phoneRegex = /^[0-9]{10,11}$/;
+        if (!phoneRegex.test(phone)) {
+            showNotification('Số điện thoại không hợp lệ! Vui lòng nhập 10-11 chữ số.');
+            return;
+        }
+        
+        // Store guest information
+        guestInfo = {
+            name: name,
+            phone: phone
+        };
+        
+        closeGuestInfoModal();
+        
+        // Continue to delivery or payment based on isDelivery flag
+        if (isDelivery) {
+            showDeliveryModal();
+        } else {
+            openPaymentModalAfterGuestInfo();
+        }
+    };
+}
+
+function closeGuestInfoModal() {
+    const modal = document.getElementById('guestInfoModal');
+    modal.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('guestInfoForm').reset();
+}
+
+// Delivery Modal
+function showDeliveryModal() {
+    // If not logged in and no guest info, collect guest info first
+    if (!currentUser && !guestInfo) {
+        showGuestInfoModal();
+        return;
+    }
+    
+    const modal = document.getElementById('deliveryModal');
+    modal.style.display = 'block';
+    
+    // Handle form submission
+    const form = document.getElementById('deliveryForm');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        
+        const address = document.getElementById('deliveryAddress').value.trim();
+        const note = document.getElementById('deliveryNote').value.trim();
+        
+        if (!address) {
+            showNotification('Vui lòng nhập địa chỉ giao hàng!');
+            return;
+        }
+        
+        // Store delivery information
+        deliveryInfo = {
+            address: address,
+            note: note
+        };
+        
+        closeDeliveryModal();
+        
+        // Update order summary to show delivery fee
+        updateOrderSummary();
+        
+        // Open payment modal
+        openPaymentModalWithDelivery();
+    };
+}
+
+function closeDeliveryModal() {
+    const modal = document.getElementById('deliveryModal');
+    modal.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('deliveryForm').reset();
+}
+
+function openPaymentModalAfterGuestInfo() {
+    const paymentModal = document.getElementById('paymentModal');
+    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+    document.getElementById('paymentTotal').textContent = formatVND(total);
+    paymentModal.style.display = 'block';
+}
+
+function openPaymentModalWithDelivery() {
     const paymentModal = document.getElementById('paymentModal');
     const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
@@ -558,23 +815,43 @@ function handlePayment() {
     const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^\d]/g, ''));
     const tax = parseFloat(document.getElementById('tax').textContent.replace(/[^\d]/g, ''));
     const discount = parseFloat(document.getElementById('discount').textContent.replace(/[^\d]/g, ''));
+    const delivery = isDelivery ? deliveryFee : 0;
     const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
     const pointsEarned = Math.floor(total / 25000);
 
     // Create order object for admin
     const order = {
         id: 'ORD' + Date.now(),
-        customerName: currentUser ? currentUser.name : 'Guest',
+        customerName: currentUser ? currentUser.name : (guestInfo ? guestInfo.name : 'Guest'),
         customerEmail: currentUser ? currentUser.email : 'guest@example.com',
         items: JSON.parse(JSON.stringify(cart)), // Deep copy
         subtotal: subtotal,
         tax: tax,
         discount: discount,
+        deliveryFee: delivery,
+        isDelivery: isDelivery,
         total: total,
         status: 'pending',
         date: new Date().toISOString(),
         paymentMethod: paymentMethod
     };
+    
+    // Add guest information to order if not logged in
+    if (!currentUser && guestInfo) {
+        order.guestInfo = {
+            name: guestInfo.name,
+            phone: guestInfo.phone
+        };
+        order.isGuest = true;
+    }
+    
+    // Add delivery information if delivery is selected
+    if (isDelivery && deliveryInfo) {
+        order.deliveryInfo = {
+            address: deliveryInfo.address,
+            note: deliveryInfo.note
+        };
+    }
 
     // Save order to admin orders
     const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
@@ -612,15 +889,33 @@ function handlePayment() {
         document.getElementById('userPoints').textContent = userPoints;
     }
 
-    // Clear cart and rewards
+    // Clear cart, rewards, guest info, and delivery info
+    const wasDelivery = isDelivery; // Save delivery status for notification
     cart = [];
     appliedDiscount = 0;
     appliedReward = null;
+    guestInfo = null; // Clear guest information
+    deliveryInfo = null; // Clear delivery information
+    isDelivery = false; // Reset delivery flag
     updateCart();
     renderRewards(); // Re-render rewards to reset the UI
 
     document.getElementById('paymentModal').style.display = 'none';
-    showNotification(`Payment successful! Order ${order.id} created. You earned ${pointsEarned} points!`);
+    
+    // Show appropriate success message
+    if (currentUser) {
+        if (wasDelivery) {
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Chúng tôi sẽ giao hàng sớm. Bạn nhận được ${pointsEarned} điểm!`);
+        } else {
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng. Bạn nhận được ${pointsEarned} điểm!`);
+        }
+    } else {
+        if (wasDelivery) {
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Chúng tôi sẽ giao hàng và liên hệ với bạn sớm!`);
+        } else {
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng!`);
+        }
+    }
     
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
