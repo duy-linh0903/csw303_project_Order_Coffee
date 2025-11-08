@@ -450,6 +450,180 @@
                 opacity: 1;
             }
         }
+
+        /* Order Detail Modal */
+        .order-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .order-modal-content {
+            background-color: var(--white);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .order-modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .order-modal-close:hover,
+        .order-modal-close:focus {
+            color: var(--dark-color);
+        }
+
+        .order-modal-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .order-detail-section h3 {
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--light-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .order-detail-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-detail-item {
+            padding: 0.75rem;
+            background-color: var(--light-color);
+            border-radius: 8px;
+        }
+
+        .order-detail-item label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-detail-item strong {
+            color: var(--dark-color);
+            font-size: 1rem;
+        }
+
+        .order-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .order-items-table th {
+            background-color: var(--light-color);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .order-items-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .order-items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .item-customization {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .order-summary-box {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .order-summary-total {
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .btn-view-order {
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-view-order:hover {
+            background-color: var(--dark-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
     </style>
 </head>
 <body>
@@ -550,6 +724,17 @@
 
     <!-- Notification -->
     <div id="notification" class="notification"></div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderDetailModal" class="order-modal">
+        <div class="order-modal-content">
+            <span class="order-modal-close">&times;</span>
+            <h2><i class="fas fa-receipt"></i> Chi tiết đơn hàng</h2>
+            <div id="orderDetailContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
 
     <script>
         let currentUser = null;
@@ -692,28 +877,140 @@
                             </span>
                         </div>
                         <div class="order-items">
-                            <h4>Items:</h4>
+                            <h4>Items: ${order.items.length} item(s)</h4>
                             <ul>
-                                ${order.items.map(item => `
+                                ${order.items.slice(0, 2).map(item => `
                                     <li>
-                                        ${item.quantity}x ${item.name}
-                                        ${item.customizations ? `
-                                            <span style="color: #999; font-size: 0.9rem;">
-                                                (${item.customizations.size}, ${item.customizations.sugar})
-                                            </span>
-                                        ` : ''}
-                                        - $${(item.price * item.quantity).toFixed(2)}
+                                        ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}
                                     </li>
                                 `).join('')}
+                                ${order.items.length > 2 ? `<li style="color: #999;">... and ${order.items.length - 2} more item(s)</li>` : ''}
                             </ul>
                         </div>
                         <div class="order-total">
                             Total: $${order.total.toFixed(2)}
                         </div>
+                        <button class="btn-view-order" onclick='viewOrderDetail(${JSON.stringify(order).replace(/'/g, "&apos;")})'>
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
                     </div>
                 `;
             }).join('');
         }
+
+        // View Order Detail
+        function viewOrderDetail(order) {
+            const modal = document.getElementById('orderDetailModal');
+            const content = document.getElementById('orderDetailContent');
+            
+            const statusClass = order.status === 'completed' ? 'status-completed' : 
+                              order.status === 'pending' ? 'status-pending' : 'status-cancelled';
+            
+            content.innerHTML = `
+                <div class="order-detail-section">
+                    <h3><i class="fas fa-info-circle"></i> Order Information</h3>
+                    <div class="order-detail-info">
+                        <div class="order-detail-item">
+                            <label>Order ID</label>
+                            <strong>#${order.id}</strong>
+                        </div>
+                        <div class="order-detail-item">
+                            <label>Status</label>
+                            <span class="order-status ${statusClass}">
+                                ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
+                        </div>
+                        <div class="order-detail-item">
+                            <label>Order Date</label>
+                            <strong>${new Date(order.date).toLocaleDateString('vi-VN', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}</strong>
+                        </div>
+                        <div class="order-detail-item">
+                            <label>Payment Method</label>
+                            <strong>${order.paymentMethod === 'card' ? 'Credit Card' : 
+                                     order.paymentMethod === 'paypal' ? 'PayPal' : 'Cash'}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-detail-section">
+                    <h3><i class="fas fa-shopping-bag"></i> Order Items</h3>
+                    <table class="order-items-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${order.items.map(item => `
+                                <tr>
+                                    <td>
+                                        <strong>${item.name}</strong>
+                                        ${item.customizations ? `
+                                            <div class="item-customization">
+                                                <i class="fas fa-coffee"></i> Size: ${item.customizations.size}<br>
+                                                <i class="fas fa-cube"></i> Sugar: ${item.customizations.sugar}<br>
+                                                ${item.customizations.ice ? `<i class="fas fa-snowflake"></i> Ice: ${item.customizations.ice}<br>` : ''}
+                                                <i class="fas fa-glass-whiskey"></i> Milk: ${item.customizations.milk}<br>
+                                                ${item.customizations.extraShots > 0 ? `<i class="fas fa-plus-circle"></i> Extra Shots: ${item.customizations.extraShots}<br>` : ''}
+                                                ${item.customizations.notes ? `<i class="fas fa-sticky-note"></i> Notes: ${item.customizations.notes}` : ''}
+                                            </div>
+                                        ` : ''}
+                                    </td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${item.price.toFixed(2)}</td>
+                                    <td><strong>$${(item.price * item.quantity).toFixed(2)}</strong></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="order-detail-section">
+                    <h3><i class="fas fa-calculator"></i> Order Summary</h3>
+                    <div class="order-summary-box">
+                        <div class="order-summary-row">
+                            <span>Subtotal:</span>
+                            <span>$${order.subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span>Tax (10%):</span>
+                            <span>$${order.tax.toFixed(2)}</span>
+                        </div>
+                        ${order.discount > 0 ? `
+                            <div class="order-summary-row">
+                                <span>Discount:</span>
+                                <span>-$${order.discount.toFixed(2)}</span>
+                            </div>
+                        ` : ''}
+                        <div class="order-summary-row order-summary-total">
+                            <span>Total:</span>
+                            <span>$${order.total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        // Close modal when clicking X
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('order-modal-close')) {
+                document.getElementById('orderDetailModal').style.display = 'none';
+            }
+            if (e.target.classList.contains('order-modal')) {
+                document.getElementById('orderDetailModal').style.display = 'none';
+            }
+        });
 
         // Load Rewards
         function loadRewards() {
