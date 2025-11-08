@@ -11,6 +11,31 @@ let customers = [];
 let menuItems = [];
 let currentAdmin = null;
 
+// Load menu items from localStorage or use default
+function initializeMenuItems() {
+    const savedMenuItems = localStorage.getItem('menuItems');
+    if (savedMenuItems) {
+        menuItems = JSON.parse(savedMenuItems);
+    } else {
+        // Default menu items (same as in script.js)
+        menuItems = [
+            { id: 1, name: 'Espresso', price: 87500, description: 'Rich and bold espresso shot', category: 'hot', image: 'linear-gradient(135deg, #6f4e37, #8B4513)' },
+            { id: 2, name: 'Cappuccino', price: 112500, description: 'Espresso with steamed milk foam', category: 'hot', image: 'linear-gradient(135deg, #8B4513, #A0522D)' },
+            { id: 3, name: 'Latte', price: 118750, description: 'Smooth espresso with steamed milk', category: 'hot', image: 'linear-gradient(135deg, #D2691E, #CD853F)' },
+            { id: 4, name: 'Americano', price: 93750, description: 'Espresso with hot water', category: 'hot', image: 'linear-gradient(135deg, #4B3621, #6F4E37)' },
+            { id: 5, name: 'Iced Coffee', price: 100000, description: 'Refreshing cold brewed coffee', category: 'iced', image: 'linear-gradient(135deg, #4682B4, #5F9EA0)' },
+            { id: 6, name: 'Iced Latte', price: 125000, description: 'Cold espresso with milk and ice', category: 'iced', image: 'linear-gradient(135deg, #87CEEB, #B0E0E6)' },
+            { id: 7, name: 'Cold Brew', price: 112500, description: 'Smooth cold brewed coffee', category: 'iced', image: 'linear-gradient(135deg, #2C3E50, #34495E)' },
+            { id: 8, name: 'Frappe', price: 137500, description: 'Blended iced coffee drink', category: 'iced', image: 'linear-gradient(135deg, #D4A574, #E8C39E)' },
+            { id: 9, name: 'Caramel Macchiato', price: 143750, description: 'Vanilla and caramel latte', category: 'special', image: 'linear-gradient(135deg, #D2691E, #F4A460)' },
+            { id: 10, name: 'Mocha', price: 131250, description: 'Chocolate and espresso blend', category: 'special', image: 'linear-gradient(135deg, #3E2723, #5D4037)' },
+            { id: 11, name: 'Vanilla Latte', price: 125000, description: 'Latte with vanilla syrup', category: 'special', image: 'linear-gradient(135deg, #F5DEB3, #FFE4B5)' },
+            { id: 12, name: 'Pumpkin Spice', price: 150000, description: 'Seasonal pumpkin spice latte', category: 'special', image: 'linear-gradient(135deg, #FF8C00, #FFA500)' }
+        ];
+        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+    }
+}
+
 // Check Authentication
 function checkAuth() {
     const adminSession = localStorage.getItem('adminSession') || sessionStorage.getItem('adminSession');
@@ -49,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    initializeMenuItems();
     loadData();
     updateDashboard();
     setupEventListeners();
@@ -71,21 +97,8 @@ function loadData() {
         customers = JSON.parse(savedUsers);
     }
 
-    // Load menu items from main script
-    menuItems = [
-        { id: 1, name: 'Espresso', price: 3.50, category: 'hot', description: 'Rich and bold espresso shot' },
-        { id: 2, name: 'Cappuccino', price: 4.50, category: 'hot', description: 'Espresso with steamed milk foam' },
-        { id: 3, name: 'Latte', price: 4.75, category: 'hot', description: 'Smooth espresso with steamed milk' },
-        { id: 4, name: 'Americano', price: 3.75, category: 'hot', description: 'Espresso with hot water' },
-        { id: 5, name: 'Iced Coffee', price: 4.00, category: 'iced', description: 'Cold brewed coffee over ice' },
-        { id: 6, name: 'Iced Latte', price: 5.00, category: 'iced', description: 'Cold espresso with milk and ice' },
-        { id: 7, name: 'Cold Brew', price: 4.50, category: 'iced', description: 'Smooth cold brewed coffee' },
-        { id: 8, name: 'Frappe', price: 5.50, category: 'iced', description: 'Blended iced coffee drink' },
-        { id: 9, name: 'Caramel Macchiato', price: 5.75, category: 'special', description: 'Vanilla and caramel latte' },
-        { id: 10, name: 'Mocha', price: 5.25, category: 'special', description: 'Chocolate and espresso blend' },
-        { id: 11, name: 'Vanilla Latte', price: 5.00, category: 'special', description: 'Latte with vanilla syrup' },
-        { id: 12, name: 'Pumpkin Spice', price: 6.00, category: 'special', description: 'Seasonal pumpkin spice latte' }
-    ];
+    // Menu items are already loaded by initializeMenuItems()
+    // Don't override them here!
 }
 
 // Update Dashboard Stats
@@ -444,6 +457,12 @@ function setupEventListeners() {
         e.preventDefault();
         addMenuItem();
     });
+
+    // Edit menu item form
+    document.getElementById('editItemForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateMenuItem();
+    });
 }
 
 // Open Add Item Modal
@@ -457,16 +476,35 @@ function addMenuItem() {
     const description = document.getElementById('newItemDescription').value;
     const price = parseFloat(document.getElementById('newItemPrice').value);
     const category = document.getElementById('newItemCategory').value;
+    const imageUrl = document.getElementById('newItemImageUrl').value.trim();
+
+    let image;
+    if (imageUrl) {
+        // Use provided image URL
+        image = `url('${imageUrl}')`;
+    } else {
+        // Generate random gradient for image
+        const colors = [
+            ['#6f4e37', '#8B4513'], ['#8B4513', '#A0522D'], ['#D2691E', '#CD853F'],
+            ['#4B3621', '#6F4E37'], ['#4682B4', '#5F9EA0'], ['#87CEEB', '#B0E0E6'],
+            ['#2C3E50', '#34495E'], ['#D4A574', '#E8C39E'], ['#D2691E', '#F4A460'],
+            ['#3E2723', '#5D4037'], ['#F5DEB3', '#FFE4B5'], ['#FF8C00', '#FFA500']
+        ];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        image = `linear-gradient(135deg, ${randomColor[0]}, ${randomColor[1]})`;
+    }
 
     const newItem = {
-        id: menuItems.length + 1,
+        id: menuItems.length > 0 ? Math.max(...menuItems.map(i => i.id)) + 1 : 1,
         name,
         description,
         price,
-        category
+        category,
+        image
     };
 
     menuItems.push(newItem);
+    localStorage.setItem('menuItems', JSON.stringify(menuItems));
     loadMenuItems();
     document.getElementById('addItemModal').style.display = 'none';
     document.getElementById('addItemForm').reset();
@@ -478,12 +516,42 @@ function editMenuItem(itemId) {
     const item = menuItems.find(i => i.id === itemId);
     if (!item) return;
 
-    const newPrice = prompt(`Enter new price for ${item.name}:`, item.price);
-    if (newPrice && !isNaN(newPrice)) {
-        item.price = parseFloat(newPrice);
-        loadMenuItems();
-        showNotification('Menu item updated successfully');
+    // Fill the edit form with current values
+    document.getElementById('editItemId').value = item.id;
+    document.getElementById('editItemName').value = item.name;
+    document.getElementById('editItemDescription').value = item.description;
+    document.getElementById('editItemPrice').value = item.price;
+    document.getElementById('editItemCategory').value = item.category;
+    
+    // Clear image URL field (user can fill if they want to change)
+    document.getElementById('editItemImageUrl').value = '';
+
+    // Show the edit modal
+    document.getElementById('editItemModal').style.display = 'block';
+}
+
+// Update Menu Item
+function updateMenuItem() {
+    const itemId = parseInt(document.getElementById('editItemId').value);
+    const item = menuItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    item.name = document.getElementById('editItemName').value;
+    item.description = document.getElementById('editItemDescription').value;
+    item.price = parseFloat(document.getElementById('editItemPrice').value);
+    item.category = document.getElementById('editItemCategory').value;
+    
+    // Update image only if new URL is provided
+    const imageUrl = document.getElementById('editItemImageUrl').value.trim();
+    if (imageUrl) {
+        item.image = `url('${imageUrl}')`;
     }
+    // Otherwise keep existing image
+
+    localStorage.setItem('menuItems', JSON.stringify(menuItems));
+    loadMenuItems();
+    document.getElementById('editItemModal').style.display = 'none';
+    showNotification('Menu item updated successfully');
 }
 
 // Delete Menu Item
@@ -491,6 +559,7 @@ function deleteMenuItem(itemId) {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
     menuItems = menuItems.filter(i => i.id !== itemId);
+    localStorage.setItem('menuItems', JSON.stringify(menuItems));
     loadMenuItems();
     showNotification('Menu item deleted successfully');
 }

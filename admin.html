@@ -289,7 +289,49 @@
                         <option value="special">Special</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>Image URL (optional)</label>
+                    <input type="url" id="newItemImageUrl" placeholder="https://example.com/image.jpg hoặc để trống để dùng gradient tự động">
+                    <small style="color: #666; font-size: 0.85rem;">Để trống sẽ tự động tạo gradient màu</small>
+                </div>
                 <button type="submit" class="btn-primary btn-full">Add Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Menu Item Modal -->
+    <div id="editItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Menu Item</h2>
+            <form id="editItemForm">
+                <input type="hidden" id="editItemId">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="editItemName" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editItemDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Price (VND)</label>
+                    <input type="number" step="1000" id="editItemPrice" required placeholder="Ví dụ: 125000">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="editItemCategory" required>
+                        <option value="hot">Hot Coffee</option>
+                        <option value="iced">Iced Coffee</option>
+                        <option value="special">Special</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Image URL (optional)</label>
+                    <input type="url" id="editItemImageUrl" placeholder="https://example.com/image.jpg hoặc để trống để giữ nguyên">
+                    <small style="color: #666; font-size: 0.85rem;">Để trống sẽ giữ nguyên ảnh hiện tại</small>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Update Item</button>
             </form>
         </div>
     </div>
