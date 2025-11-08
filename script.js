@@ -457,7 +457,13 @@ function loadUserData() {
         document.getElementById('userPoints').textContent = userPoints;
         
         const signInBtn = document.getElementById('signInBtn');
-        signInBtn.textContent = `Hi, ${currentUser.name}`;
+        const firstName = currentUser.name.split(' ')[0];
+        signInBtn.innerHTML = `
+            <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <span>${firstName}</span>
+        `;
         signInBtn.href = '#';
         
         // Remove old event listeners by cloning
@@ -467,7 +473,7 @@ function loadUserData() {
         // Add new event listener
         newSignInBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            showUserMenu();
+            showUserMenu(e);
         });
     }
 }
@@ -484,7 +490,15 @@ function checkLoginStatus() {
         
         const signInBtn = document.getElementById('signInBtn');
         console.log('User logged in:', currentUser.name);
-        signInBtn.textContent = `Hi, ${currentUser.name}`;
+        
+        // Update button to show user avatar/name
+        const firstName = currentUser.name.split(' ')[0];
+        signInBtn.innerHTML = `
+            <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <span>${firstName}</span>
+        `;
         signInBtn.href = '#';
         
         // Remove old event listeners by cloning
@@ -494,7 +508,7 @@ function checkLoginStatus() {
         // Add new event listener
         newSignInBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            showUserMenu();
+            showUserMenu(e);
         });
     } else {
         console.log('No user logged in');
@@ -502,32 +516,86 @@ function checkLoginStatus() {
 }
 
 // Show User Menu
-function showUserMenu() {
-    if (confirm(`Welcome ${currentUser.name}!\n\nDo you want to logout?`)) {
-        localStorage.removeItem('currentUser');
-        sessionStorage.removeItem('currentUser');
-        currentUser = null;
-        userPoints = 0;
-        
-        // Reset sign in button
-        const signInBtn = document.getElementById('signInBtn');
-        signInBtn.textContent = 'Sign In';
-        signInBtn.href = 'admin-login.html';
-        
-        // Remove old event listeners by cloning
-        const newSignInBtn = signInBtn.cloneNode(true);
-        signInBtn.parentNode.replaceChild(newSignInBtn, signInBtn);
-        
-        document.getElementById('userPoints').textContent = '0';
-        showNotification('Logged out successfully!');
-        
-        // Clear cart and rewards
-        cart = [];
-        appliedDiscount = 0;
-        appliedReward = null;
-        updateCart();
-        renderRewards();
-    }
+function showUserMenu(event) {
+    // Get button position for dropdown placement
+    const signInBtn = document.getElementById('signInBtn');
+    const rect = signInBtn.getBoundingClientRect();
+    
+    const menu = `
+        <div class="user-menu-overlay" onclick="this.remove()">
+            <div class="user-menu-dropdown" style="top: ${rect.bottom + 10}px; right: 20px;" onclick="event.stopPropagation()">
+                <div class="user-menu-header">
+                    <div class="user-menu-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-menu-info">
+                        <p class="user-menu-name">${currentUser.name}</p>
+                        <p class="user-menu-email">${currentUser.email}</p>
+                    </div>
+                </div>
+                <div class="user-menu-divider"></div>
+                <a href="profile.html" class="user-menu-item">
+                    <i class="fas fa-user"></i>
+                    <span>Thông tin khách hàng</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <a href="#rewards" class="user-menu-item" onclick="document.querySelector('.user-menu-overlay').remove()">
+                    <i class="fas fa-gift"></i>
+                    <span>Điểm thưởng</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <div class="user-menu-divider"></div>
+                <a href="#" onclick="logoutUser(event)" class="user-menu-item user-menu-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', menu);
+    
+    // Animate dropdown
+    setTimeout(() => {
+        document.querySelector('.user-menu-dropdown').style.opacity = '1';
+        document.querySelector('.user-menu-dropdown').style.transform = 'translateY(0)';
+    }, 10);
+}
+
+// Logout User
+function logoutUser(event) {
+    if (event) event.preventDefault();
+    
+    localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('currentUser');
+    currentUser = null;
+    userPoints = 0;
+    
+    // Reset sign in button
+    const signInBtn = document.getElementById('signInBtn');
+    signInBtn.innerHTML = `
+        <i class="fas fa-user"></i>
+        <span>Sign In</span>
+    `;
+    signInBtn.href = 'admin-login.html';
+    
+    // Remove old event listeners by cloning
+    const newSignInBtn = signInBtn.cloneNode(true);
+    signInBtn.parentNode.replaceChild(newSignInBtn, signInBtn);
+    
+    document.getElementById('userPoints').textContent = '0';
+    showNotification('Logged out successfully!');
+    
+    // Clear cart and rewards
+    cart = [];
+    appliedDiscount = 0;
+    appliedReward = null;
+    updateCart();
+    renderRewards();
+    
+    // Remove menu
+    const menuOverlay = document.querySelector('.user-menu-overlay');
+    if (menuOverlay) menuOverlay.remove();
 }
 
 // Open Payment Modal
@@ -580,6 +648,16 @@ function handlePayment() {
     adminOrders.push(order);
     localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
 
+    // Save order to user orders (for profile page)
+    const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+    const userOrder = {
+        ...order,
+        userEmail: currentUser ? currentUser.email : 'guest@example.com',
+        status: 'completed' // Mark as completed for user view
+    };
+    userOrders.push(userOrder);
+    localStorage.setItem('userOrders', JSON.stringify(userOrders));
+
     if (currentUser) {
         userPoints += pointsEarned;
         currentUser.points = userPoints;
@@ -590,7 +668,13 @@ function handlePayment() {
             users[userIndex].points = userPoints;
             localStorage.setItem('users', JSON.stringify(users));
         }
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        // Update in both localStorage and sessionStorage
+        if (localStorage.getItem('currentUser')) {
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        } else {
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        }
         
         document.getElementById('userPoints').textContent = userPoints;
     }

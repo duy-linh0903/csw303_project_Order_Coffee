@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Coffee Cabin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6f4e37;
+            --secondary-color: #d4a574;
+            --accent-color: #ff6b6b;
+            --dark-color: #2c1810;
+            --light-color: #f8f5f2;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-brand i {
+            font-size: 2rem;
+        }
+
+        .back-btn {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--dark-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Profile Container */
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--white);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--white);
+        }
+
+        .profile-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-email {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Profile Grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .info-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-group label {
+            display: block;
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .info-group input,
+        .info-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--light-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .info-group input:focus,
+        .info-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .info-group input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .btn-edit,
+        .btn-save {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit:hover,
+        .btn-save:hover {
+            background-color: var(--dark-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Points Section */
+        .points-section {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .points-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            margin: 1rem 0;
+        }
+
+        .points-label {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Orders Section */
+        .orders-full {
+            grid-column: 1 / -1;
+        }
+
+        .orders-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            background-color: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .order-id {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-items {
+            margin-top: 1rem;
+        }
+
+        .order-items h4 {
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .order-items ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .order-items li {
+            padding: 0.5rem 0;
+            color: #555;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .order-items li:last-child {
+            border-bottom: none;
+        }
+
+        .order-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ddd;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            text-align: right;
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-orders i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Rewards Section */
+        .rewards-card {
+            grid-column: 1 / -1;
+        }
+
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .reward-box {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reward-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .reward-box h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .reward-points {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .reward-status {
+            padding: 0.5rem 1rem;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .reward-available {
+            background-color: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4CAF50;
+        }
+
+        .reward-locked {
+            background-color: rgba(158, 158, 158, 0.3);
+            border: 2px solid #9E9E9E;
+        }
+
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-full,
+            .rewards-card {
+                grid-column: 1;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .profile-container {
+                padding: 0 1rem;
+            }
+
+            .rewards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <i class="fas fa-coffee"></i>
+                <span>Coffee Cabin</span>
+            </a>
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Profile Container -->
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <h1 id="profileName">Loading...</h1>
+            <p class="profile-email" id="profileEmail">Loading...</p>
+        </div>
+
+        <!-- Profile Grid -->
+        <div class="profile-grid">
+            <!-- Personal Information -->
+            <div class="profile-card">
+                <h2><i class="fas fa-user-circle"></i> Personal Information</h2>
+                <form id="personalInfoForm">
+                    <div class="info-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" disabled>
+                    </div>
+                    <div class="info-group">
+                        <label>Email</label>
+                        <input type="email" id="email" disabled>
+                    </div>
+                    <div class="info-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone" placeholder="Enter your phone number" disabled>
+                    </div>
+                    <div class="info-group">
+                        <label>Address</label>
+                        <textarea id="address" rows="3" placeholder="Enter your address" disabled></textarea>
+                    </div>
+                    <button type="button" class="btn-edit" id="editBtn" onclick="toggleEdit()">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                    <button type="submit" class="btn-save" id="saveBtn" style="display: none;">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <!-- Points & Rewards -->
+            <div class="profile-card">
+                <h2><i class="fas fa-star"></i> Rewards Points</h2>
+                <div class="points-section">
+                    <i class="fas fa-gift" style="font-size: 2rem; color: var(--dark-color);"></i>
+                    <div class="points-display" id="userPoints">0</div>
+                    <div class="points-label">Available Points</div>
+                </div>
+                <p style="text-align: center; color: #666; margin-top: 1rem;">
+                    <i class="fas fa-info-circle"></i> Earn 1 point for every $1 spent
+                </p>
+                <p style="text-align: center; margin-top: 0.5rem;">
+                    <a href="index.html#rewards" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                        <i class="fas fa-arrow-right"></i> View Available Rewards
+                    </a>
+                </p>
+            </div>
+
+            <!-- Available Rewards -->
+            <div class="profile-card rewards-card">
+                <h2><i class="fas fa-gift"></i> Available Rewards</h2>
+                <div class="rewards-grid" id="rewardsGrid">
+                    <!-- Rewards will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Order History -->
+            <div class="profile-card orders-full">
+                <h2><i class="fas fa-receipt"></i> Order History</h2>
+                <div class="orders-list" id="ordersList">
+                    <div class="empty-orders">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>No orders yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        let currentUser = null;
+        let isEditing = false;
+
+        // Rewards Data
+        const rewardsData = [
+            { id: 1, name: '10% Off', points: 100, discount: 10, type: 'percentage' },
+            { id: 2, name: '15% Off', points: 150, discount: 15, type: 'percentage' },
+            { id: 3, name: 'Free Coffee', points: 75, discount: 5, type: 'fixed' },
+            { id: 4, name: '$2 Off', points: 50, discount: 2, type: 'fixed' }
+        ];
+
+        // Load user data on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadUserProfile();
+            loadOrderHistory();
+            loadRewards();
+        });
+
+        // Load User Profile
+        function loadUserProfile() {
+            const savedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            
+            if (!savedUser) {
+                showNotification('Please sign in to view your profile');
+                setTimeout(() => {
+                    window.location.href = 'admin-login.html';
+                }, 2000);
+                return;
+            }
+
+            currentUser = JSON.parse(savedUser);
+            
+            // Display profile data
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('fullName').value = currentUser.name;
+            document.getElementById('email').value = currentUser.email;
+            document.getElementById('phone').value = currentUser.phone || '';
+            document.getElementById('address').value = currentUser.address || '';
+            document.getElementById('userPoints').textContent = currentUser.points || 0;
+        }
+
+        // Toggle Edit Mode
+        function toggleEdit() {
+            isEditing = !isEditing;
+            const inputs = document.querySelectorAll('#personalInfoForm input:not([type="email"]), #personalInfoForm textarea');
+            const editBtn = document.getElementById('editBtn');
+            const saveBtn = document.getElementById('saveBtn');
+
+            if (isEditing) {
+                inputs.forEach(input => {
+                    if (input.id !== 'email') {
+                        input.disabled = false;
+                    }
+                });
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-flex';
+            } else {
+                inputs.forEach(input => input.disabled = true);
+                editBtn.style.display = 'inline-flex';
+                saveBtn.style.display = 'none';
+            }
+        }
+
+        // Handle Form Submit
+        document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Update user data
+            currentUser.name = document.getElementById('fullName').value;
+            currentUser.phone = document.getElementById('phone').value;
+            currentUser.address = document.getElementById('address').value;
+
+            // Update in storage
+            const storageKey = localStorage.getItem('currentUser') ? 'localStorage' : 'sessionStorage';
+            if (storageKey === 'localStorage') {
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            } else {
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+
+            // Update in users array
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            if (userIndex !== -1) {
+                users[userIndex] = { ...users[userIndex], ...currentUser };
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            // Update profile header
+            document.getElementById('profileName').textContent = currentUser.name;
+
+            toggleEdit();
+            showNotification('Profile updated successfully!');
+        });
+
+        // Load Order History
+        function loadOrderHistory() {
+            const orders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+            const userOrders = orders.filter(order => order.userEmail === currentUser.email);
+            const ordersList = document.getElementById('ordersList');
+
+            if (userOrders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>No orders yet</p>
+                        <p style="margin-top: 1rem;">
+                            <a href="index.html#menu" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                                <i class="fas fa-arrow-right"></i> Start Ordering
+                            </a>
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            ordersList.innerHTML = userOrders.map(order => {
+                const statusClass = order.status === 'completed' ? 'status-completed' : 
+                                  order.status === 'pending' ? 'status-pending' : 'status-cancelled';
+                
+                return `
+                    <div class="order-item">
+                        <div class="order-header">
+                            <div>
+                                <span class="order-id">Order #${order.id}</span>
+                                <br>
+                                <span class="order-date">${new Date(order.date).toLocaleDateString('vi-VN', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}</span>
+                            </div>
+                            <span class="order-status ${statusClass}">
+                                ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
+                        </div>
+                        <div class="order-items">
+                            <h4>Items:</h4>
+                            <ul>
+                                ${order.items.map(item => `
+                                    <li>
+                                        ${item.quantity}x ${item.name}
+                                        ${item.customizations ? `
+                                            <span style="color: #999; font-size: 0.9rem;">
+                                                (${item.customizations.size}, ${item.customizations.sugar})
+                                            </span>
+                                        ` : ''}
+                                        - $${(item.price * item.quantity).toFixed(2)}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="order-total">
+                            Total: $${order.total.toFixed(2)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load Rewards
+        function loadRewards() {
+            const userPoints = currentUser.points || 0;
+            const rewardsGrid = document.getElementById('rewardsGrid');
+
+            rewardsGrid.innerHTML = rewardsData.map(reward => {
+                const canRedeem = userPoints >= reward.points;
+                const statusClass = canRedeem ? 'reward-available' : 'reward-locked';
+                const statusText = canRedeem ? 'Available' : `Need ${reward.points - userPoints} more points`;
+
+                return `
+                    <div class="reward-box">
+                        <h3>${reward.name}</h3>
+                        <div class="reward-points">
+                            <i class="fas fa-star"></i> ${reward.points} pts
+                        </div>
+                        <div class="reward-status ${statusClass}">
+                            ${canRedeem ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-lock"></i>'} 
+                            ${statusText}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show Notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
