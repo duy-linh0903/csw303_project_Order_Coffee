@@ -613,16 +613,43 @@ body {
 
 .modal-content {
     background-color: var(--white);
-    margin: 5% auto;
+    margin: 3% auto;
     padding: 2rem;
     border-radius: 15px;
     max-width: 500px;
     position: relative;
     animation: slideDown 0.3s;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-large {
-    max-width: 900px;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar for Modal */
+.modal-content::-webkit-scrollbar,
+.modal-large::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track,
+.modal-large::-webkit-scrollbar-track {
+    background: var(--light-color);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb,
+.modal-large::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover,
+.modal-large::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
 }
 
 .close {
@@ -1159,4 +1186,840 @@ body {
     background-color: var(--light-color);
     border-radius: 5px;
     font-size: 0.85rem;
+}
+
+/* Orders Page Styles */
+.orders-section {
+    padding: 3rem 0 4rem;
+    min-height: calc(100vh - 200px);
+    background: linear-gradient(135deg, #f8f5f2 0%, #fff 100%);
+}
+
+.orders-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.orders-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.orders-filter {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.orders-filter .filter-btn {
+    padding: 0.8rem 1.8rem;
+    border-radius: 30px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.orders-filter .filter-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(111, 78, 55, 0.3);
+}
+
+.orders-filter .filter-btn.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
+}
+
+.orders-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.stat-info h3 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin: 0;
+    font-weight: 700;
+}
+
+.stat-info p {
+    color: #666;
+    margin: 0.3rem 0 0 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.orders-list {
+    display: grid;
+    gap: 2rem;
+}
+
+.order-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+.order-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+}
+
+.order-card:hover {
+    box-shadow: 0 15px 50px rgba(111, 78, 55, 0.2);
+    transform: translateY(-5px);
+    border-color: var(--secondary-color);
+}
+
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px dashed var(--light-color);
+}
+
+.order-card-header h3 {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.order-card-header h3::before {
+    content: '📦';
+    font-size: 1.3rem;
+}
+
+.order-date {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0.8rem 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.order-date i {
+    color: var(--accent-color);
+}
+
+.order-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-end;
+}
+
+.delivery-badge {
+    background: linear-gradient(135deg, #4CAF50, #66BB6A);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.delivery-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.pickup-badge {
+    background: linear-gradient(135deg, #2196F3, #42A5F5);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.pickup-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+.order-card-body {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f5f2, #fff);
+    border-radius: 12px;
+}
+
+.order-items-preview {
+    color: #666;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.order-items-preview i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.items-list {
+    color: #888;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+    font-style: italic;
+}
+
+.order-delivery-info {
+    color: #666;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
+    padding: 0.8rem;
+    background: white;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent-color);
+}
+
+.order-delivery-info i {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+}
+
+.order-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--light-color);
+}
+
+.order-total {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.order-total span {
+    color: #888;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.order-total strong {
+    color: var(--accent-color);
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-view-detail {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(111, 78, 55, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-view-detail:hover {
+    background: linear-gradient(135deg, var(--dark-color), #1a0f08);
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(111, 78, 55, 0.4);
+}
+
+.btn-view-detail i {
+    transition: transform 0.3s ease;
+}
+
+.btn-view-detail:hover i {
+    transform: translateX(5px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state i {
+    font-size: 5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.empty-state h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+}
+
+.empty-state p {
+    color: #999;
+    font-size: 1.1rem;
+}
+
+.empty-state .btn-primary {
+    margin-top: 2rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(111, 78, 55, 0.3);
+}
+
+.empty-state .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(111, 78, 55, 0.4);
+}
+
+/* Order Detail Modal Styles */
+.order-detail-container {
+    padding: 1.5rem;
+}
+
+.order-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, var(--primary-color), var(--accent-color)) border-box;
+    border-radius: 15px;
+    padding: 1.5rem;
+    background-color: var(--light-color);
+}
+
+.order-detail-header h2 {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.order-detail-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Compact Info Layout */
+.order-detail-info-compact {
+    background: linear-gradient(135deg, #fff, var(--light-color));
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    border: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+}
+
+.delivery-address-row {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px dashed rgba(139, 69, 19, 0.15);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--dark-color);
+    font-size: 0.95rem;
+}
+
+.info-item i {
+    color: var(--accent-color);
+    font-size: 1rem;
+}
+
+.info-item .sub-info {
+    margin-left: 0.5rem;
+    color: #666;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.delivery-address {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.delivery-address strong {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.delivery-note {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #666;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.delivery-note i {
+    color: var(--accent-color);
+}
+
+.info-card {
+    background: linear-gradient(135deg, #fff, var(--light-color));
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border-color: var(--secondary-color);
+}
+
+.info-card.full-width {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #e8f5e9, #f1f8f4);
+    border-left: 5px solid #4CAF50;
+}
+
+.info-card h4 {
+    color: var(--primary-color);
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-card h4 i {
+    color: var(--accent-color);
+}
+
+.info-card p {
+    margin: 0.5rem 0;
+    color: var(--dark-color);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.order-items-section {
+    margin-bottom: 2.5rem;
+}
+
+.order-items-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.order-items-list {
+    background: var(--light-color);
+    padding: 1.5rem;
+    border-radius: 15px;
+}
+
+.order-item-detail-card {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary-color);
+}
+
+.order-item-detail-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.order-item-detail-card:last-child {
+    margin-bottom: 0;
+}
+
+.item-info h4 {
+    margin: 0 0 0.8rem 0;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.item-customizations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
+}
+
+.item-customizations span {
+    background: linear-gradient(135deg, var(--light-color), #fff);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #666;
+    border: 1px solid var(--secondary-color);
+    font-weight: 500;
+}
+
+.item-note {
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+    background: #fff9e6;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border-left: 3px solid #ffc107;
+}
+
+.item-quantity {
+    color: #666;
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: var(--light-color);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+}
+
+.item-price strong {
+    color: var(--accent-color);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.order-summary-section {
+    background: linear-gradient(135deg, #fff, var(--light-color));
+    border-radius: 20px;
+    padding: 2rem;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 10px 30px rgba(111, 78, 55, 0.15);
+}
+
+.order-summary-section h3 {
+    color: var(--primary-color);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.summary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 2px dashed var(--light-color);
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.summary-row:hover {
+    background: var(--light-color);
+}
+
+.summary-row.discount {
+    color: var(--accent-color);
+    background: #fff3f3;
+    font-weight: 600;
+}
+
+.summary-row.total {
+    border-top: 3px solid var(--primary-color);
+    border-bottom: none;
+    padding-top: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    background: linear-gradient(135deg, var(--light-color), #fff);
+    margin-top: 1rem;
+}
+
+.summary-row.total strong {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.summary-row.payment-method {
+    background: linear-gradient(135deg, var(--light-color), #f0f0f0);
+    padding: 1.2rem;
+    border-radius: 12px;
+    border-bottom: none;
+    border-left: 4px solid var(--primary-color);
+    font-weight: 500;
+}
+
+/* Responsive Design for Orders Page */
+@media (max-width: 768px) {
+    .orders-header h1 {
+        font-size: 2rem;
+    }
+    
+    .orders-filter {
+        flex-direction: column;
+    }
+    
+    .orders-filter .filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .orders-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .order-card-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .order-status {
+        align-items: flex-start;
+    }
+    
+    .order-card-footer {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+    
+    .btn-view-detail {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .order-detail-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .order-detail-info-compact .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .info-item {
+        width: 100%;
+    }
+    
+    .order-item-detail-card {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .item-quantity,
+    .item-price {
+        justify-self: start;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .stat-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .order-total strong {
+        font-size: 1.5rem;
+    }
+    
+    .modal-content,
+    .modal-large {
+        margin: 2% auto;
+        max-height: 95vh;
+        max-width: 95%;
+    }
+    
+    .order-detail-container {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .orders-section {
+        padding: 2rem 0 3rem;
+    }
+    
+    .orders-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .order-card {
+        padding: 1.5rem;
+    }
+    
+    .order-card-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .empty-state {
+        padding: 3rem 1.5rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+    }
+    
+    .modal-content,
+    .modal-large {
+        padding: 1rem;
+        margin: 1% auto;
+        max-width: 98%;
+    }
+    
+    .order-detail-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .info-card {
+        padding: 1.5rem;
+    }
+    
+    .order-items-section h3,
+    .order-summary-section h3 {
+        font-size: 1.3rem;
+    }
 }
