@@ -223,6 +223,132 @@
             font-size: 1.1rem;
         }
 
+        /* Member Card in Profile */
+        .member-card-profile {
+            margin-top: 1.5rem;
+        }
+
+        .member-card-bg-profile {
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            border-radius: 20px;
+            padding: 0;
+            color: white;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .member-card-bg-profile[data-tier="silver"] {
+            background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 50%, #a8a8a8 100%);
+        }
+
+        .member-card-bg-profile[data-tier="gold"] {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ff8c00 100%);
+        }
+
+        .member-card-bg-profile[data-tier="diamond"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+
+        .card-avatar-profile {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto 1rem auto;
+            font-size: 2.5rem;
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header-profile {
+            text-align: center;
+            padding: 0 2rem 1rem 2rem;
+        }
+
+        .card-info-profile {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .card-name-profile {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .card-tier-profile {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .card-stats-profile {
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem 2rem;
+            gap: 1rem;
+        }
+
+        .stat-item-profile {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-label-profile {
+            font-size: 0.7rem;
+            opacity: 0.75;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value-profile {
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-progress-profile {
+            padding: 0 2rem 2rem 2rem;
+        }
+
+        .progress-bar-profile {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill-profile {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
+            border-radius: 20px;
+            transition: width 0.8s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .progress-text-profile {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            display: block;
+            text-align: center;
+        }
+
         /* Orders Section */
         .orders-full {
             grid-column: 1 / -1;
@@ -706,6 +832,43 @@
                     </a>
                 </p>
             </div>
+            
+            <!-- Member Card -->
+            <div class="profile-card">
+                <h2><i class="fas fa-id-card"></i> Thẻ Thành Viên</h2>
+                <div class="member-card-profile">
+                    <div class="member-card-bg-profile" id="memberCardProfile" data-tier="none">
+                        <div class="card-avatar-profile" id="cardAvatarProfile">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="card-header-profile">
+                            <div class="card-info-profile">
+                                <span class="card-name-profile" id="memberNameProfile">Guest</span>
+                                <span class="card-tier-profile" id="memberTierProfile">Chưa có thẻ</span>
+                            </div>
+                        </div>
+                        <div class="card-stats-profile">
+                            <div class="stat-item-profile">
+                                <span class="stat-label-profile">Tổng chi tiêu</span>
+                                <span class="stat-value-profile" id="totalSpendingProfile">0₫</span>
+                            </div>
+                            <div class="stat-item-profile">
+                                <span class="stat-label-profile">Điểm thưởng</span>
+                                <span class="stat-value-profile" id="memberPointsProfile">0</span>
+                            </div>
+                        </div>
+                        <div class="card-progress-profile">
+                            <div class="progress-bar-profile">
+                                <div class="progress-fill-profile" id="progressFillProfile"></div>
+                            </div>
+                            <span class="progress-text-profile" id="progressTextProfile">Đăng nhập để xem tiến độ</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="membercard.html" style="display: inline-block; width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; text-align: center; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 1rem; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <i class="fas fa-arrow-right"></i> Xem chi tiết thẻ
+                </a>
+            </div>
 
             <!-- Available Rewards -->
             <div class="profile-card rewards-card">
@@ -764,6 +927,7 @@
             loadUserProfile();
             loadOrderHistory();
             loadRewards();
+            updateMemberCardProfile();
         });
 
         // Load User Profile
@@ -1057,6 +1221,88 @@
             setTimeout(() => {
                 notification.style.display = 'none';
             }, 3000);
+        }
+
+        // Update Member Card in Profile
+        function updateMemberCardProfile() {
+            const memberCardBg = document.getElementById('memberCardProfile');
+            const cardAvatar = document.getElementById('cardAvatarProfile');
+            const memberName = document.getElementById('memberNameProfile');
+            const memberTier = document.getElementById('memberTierProfile');
+            const totalSpendingEl = document.getElementById('totalSpendingProfile');
+            const memberPoints = document.getElementById('memberPointsProfile');
+            const progressFill = document.getElementById('progressFillProfile');
+            const progressText = document.getElementById('progressTextProfile');
+            
+            if (!currentUser) {
+                memberName.textContent = 'Guest';
+                memberTier.textContent = 'Chưa có thẻ';
+                totalSpendingEl.textContent = '0₫';
+                memberPoints.textContent = '0';
+                progressFill.style.width = '0%';
+                progressText.textContent = 'Đăng nhập để xem tiến độ';
+                memberCardBg.setAttribute('data-tier', 'none');
+                cardAvatar.innerHTML = '<i class="fas fa-user-circle"></i>';
+                return;
+            }
+            
+            // Calculate total spending from user orders
+            const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+            const userOrdersList = userOrders.filter(order => order.userEmail === currentUser.email);
+            const totalSpending = userOrdersList.reduce((sum, order) => sum + order.total, 0);
+            
+            // Determine tier based on spending
+            let tier = 'none';
+            let tierName = 'Chưa có thẻ';
+            let nextTier = 'Thẻ Bạc';
+            let nextTierAmount = 500000;
+            let progress = 0;
+            let avatarIcon = '<i class=\"fas fa-user\"></i>';
+            
+            if (totalSpending >= 10000000) {
+                tier = 'diamond';
+                tierName = 'Thẻ Kim Cương';
+                nextTier = 'Thẻ Kim Cương (Đã đạt)';
+                nextTierAmount = 10000000;
+                progress = 100;
+                avatarIcon = '<i class=\"fas fa-gem\"></i>';
+            } else if (totalSpending >= 3000000) {
+                tier = 'gold';
+                tierName = 'Thẻ Vàng';
+                nextTier = 'Thẻ Kim Cương';
+                nextTierAmount = 10000000;
+                progress = (totalSpending / nextTierAmount) * 100;
+                avatarIcon = '<i class=\"fas fa-crown\"></i>';
+            } else if (totalSpending >= 500000) {
+                tier = 'silver';
+                tierName = 'Thẻ Bạc';
+                nextTier = 'Thẻ Vàng';
+                nextTierAmount = 3000000;
+                progress = (totalSpending / nextTierAmount) * 100;
+                avatarIcon = '<i class=\"fas fa-medal\"></i>';
+            } else {
+                progress = (totalSpending / nextTierAmount) * 100;
+                avatarIcon = '<i class=\"fas fa-user-circle\"></i>';
+            }
+            
+            // Update card display
+            memberName.textContent = currentUser.name;
+            memberTier.textContent = tierName;
+            totalSpendingEl.textContent = formatVND(totalSpending);
+            memberPoints.textContent = currentUser.points || 0;
+            progressFill.style.width = progress + '%';
+            cardAvatar.innerHTML = avatarIcon;
+            
+            if (tier === 'none') {
+                progressText.textContent = `Còn ${formatVND(nextTierAmount - totalSpending)} để đạt ${nextTier}`;
+            } else if (progress < 100) {
+                progressText.textContent = `Còn ${formatVND(nextTierAmount - totalSpending)} để đạt ${nextTier}`;
+            } else {
+                progressText.textContent = 'Bạn đã đạt cấp thẻ cao nhất!';
+            }
+            
+            // Update card background based on tier
+            memberCardBg.setAttribute('data-tier', tier);
         }
     </script>
 </body>

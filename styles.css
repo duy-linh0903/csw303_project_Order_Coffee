@@ -784,15 +784,716 @@ html {
 }
 
 /* Rewards Section */
+/* Rewards Section */
 .rewards-section {
     padding: 80px 0;
     animation: fadeInUp 0.8s ease-out;
 }
 
-.rewards-container {
+.rewards-container-original {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 2rem;
+}
+
+/* Member Card Preview (in rewards section) */
+.member-card-preview {
+    margin-top: 3rem;
+    padding-top: 3rem;
+    border-top: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.member-card-preview h3 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.member-card-preview h3::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    border-radius: 2px;
+}
+
+.member-card-compact {
+    margin-bottom: 1.5rem;
+    perspective: 1500px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.member-card-bg-compact {
+    background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+    border-radius: 20px;
+    padding: 0;
+    color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    aspect-ratio: 1.586 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.member-card-bg-compact::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.member-card-bg-compact::after {
+    content: 'MEMBER';
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    font-size: 2.5rem;
+    font-weight: 900;
+    opacity: 0.05;
+    letter-spacing: 3px;
+    pointer-events: none;
+}
+
+.member-card-bg-compact[data-tier="silver"] {
+    background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 50%, #a8a8a8 100%);
+    box-shadow: 0 20px 60px rgba(192, 192, 192, 0.4);
+}
+
+.member-card-bg-compact[data-tier="gold"] {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ff8c00 100%);
+    box-shadow: 0 20px 60px rgba(255, 215, 0, 0.5);
+}
+
+.member-card-bg-compact[data-tier="diamond"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.5);
+}
+
+.member-card-bg-compact:hover {
+    transform: translateY(-8px) rotateX(5deg) rotateY(-2deg);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+}
+
+.member-card-bg-compact[data-tier="silver"]:hover {
+    box-shadow: 0 30px 80px rgba(192, 192, 192, 0.6);
+}
+
+.member-card-bg-compact[data-tier="gold"]:hover {
+    box-shadow: 0 30px 80px rgba(255, 215, 0, 0.7);
+}
+
+.member-card-bg-compact[data-tier="diamond"]:hover {
+    box-shadow: 0 30px 80px rgba(102, 126, 234, 0.7);
+}
+
+.card-header-compact {
+    padding: 2rem 2rem 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+}
+
+.card-info-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.card-name-compact {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.card-tier-compact {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.card-icon-compact {
+    font-size: 2rem;
+    opacity: 0.9;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.card-stats-compact {
+    padding: 0 2rem;
+    display: flex;
+    gap: 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-item-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.stat-label-compact {
+    font-size: 0.65rem;
+    opacity: 0.75;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.stat-value-compact {
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card-progress-compact {
+    padding: 1.5rem 2rem 2rem 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.progress-bar-compact {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.progress-fill-compact {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
+    border-radius: 20px;
+    transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    position: relative;
+}
+
+.progress-fill-compact::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 2s infinite;
+}
+
+.progress-text-compact {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    display: block;
+    text-align: left;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.view-full-card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(139, 69, 19, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.view-full-card-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.view-full-card-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.view-full-card-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(139, 69, 19, 0.5);
+}
+
+.view-full-card-btn i {
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.view-full-card-btn:hover i {
+    transform: translateX(5px);
+}
+
+.view-full-card-btn span {
+    position: relative;
+    z-index: 1;
+}
+
+/* Member Benefits Info */
+.member-benefits-info {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.05), rgba(255, 107, 107, 0.05));
+    border-radius: 16px;
+    border: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.member-benefits-info h4 {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.member-benefits-info h4 i {
+    color: var(--accent-color);
+}
+
+.benefit-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border-left: 4px solid;
+}
+
+.benefit-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-item.benefit-silver {
+    border-color: #c0c0c0;
+}
+
+.benefit-item.benefit-silver i {
+    color: #c0c0c0;
+    font-size: 1.5rem;
+}
+
+.benefit-item.benefit-gold {
+    border-color: #ffd700;
+}
+
+.benefit-item.benefit-gold i {
+    color: #ffd700;
+    font-size: 1.5rem;
+}
+
+.benefit-item.benefit-diamond {
+    border-color: #667eea;
+}
+
+.benefit-item.benefit-diamond i {
+    color: #667eea;
+    font-size: 1.5rem;
+}
+
+.benefit-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+}
+
+.benefit-content strong {
+    font-size: 1rem;
+    color: var(--primary-color);
+    margin-bottom: 0.2rem;
+}
+
+.benefit-content span {
+    font-size: 0.85rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.benefit-content span i {
+    color: #4caf50;
+    font-size: 0.75rem;
+}
+
+.benefit-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+.benefit-note i {
+    color: var(--accent-color);
+    margin-right: 0.3rem;
+}
+
+.membercard-section {
+    padding: 80px 0;
+    background: linear-gradient(to bottom, var(--light-color), #fff);
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* Membership Tiers */
+.membership-tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.tier-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+}
+
+.tier-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #c0c0c0, #e8e8e8);
+}
+
+.tier-card[data-tier="silver"]::before {
+    background: linear-gradient(90deg, #c0c0c0, #e8e8e8);
+}
+
+.tier-card[data-tier="gold"]::before {
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+}
+
+.tier-card[data-tier="diamond"]::before {
+    background: linear-gradient(90deg, #00d4ff, #7c4dff);
+}
+
+.tier-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.tier-card.current-tier {
+    border: 3px solid var(--accent-color);
+    box-shadow: 0 15px 50px rgba(255, 107, 107, 0.3);
+    transform: scale(1.05);
+}
+
+.tier-card.current-tier::after {
+    content: 'Hạng hiện tại';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(135deg, var(--accent-color), #ff5252);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.tier-badge {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+    color: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.tier-card[data-tier="silver"] .tier-badge {
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+}
+
+.tier-card[data-tier="gold"] .tier-badge {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #8b6914;
+}
+
+.tier-card[data-tier="diamond"] .tier-badge {
+    background: linear-gradient(135deg, #00d4ff, #7c4dff);
+}
+
+.tier-card h3 {
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.tier-requirement {
+    text-align: center;
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.tier-benefits {
+    list-style: none;
+    padding: 0;
+}
+
+.tier-benefits li {
+    padding: 0.75rem 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px dashed var(--light-color);
+}
+
+.tier-benefits li:last-child {
+    border-bottom: none;
+}
+
+.tier-benefits i {
+    color: #4caf50;
+    font-size: 1.1rem;
+}
+
+/* Current Member Status */
+.current-member-status {
+    margin-bottom: 4rem;
+}
+
+.member-card-display {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.member-card-bg {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    border-radius: 25px;
+    padding: 2.5rem;
+    color: white;
+    box-shadow: 0 15px 50px rgba(111, 78, 55, 0.4);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.member-card-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.05),
+        transparent
+    );
+    animation: shimmer 4s infinite;
+}
+
+.member-card-bg:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(111, 78, 55, 0.5);
+}
+
+.member-card-bg[data-tier="silver"] {
+    background: linear-gradient(135deg, #c0c0c0, #8d8d8d);
+}
+
+.member-card-bg[data-tier="gold"] {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+}
+
+.member-card-bg[data-tier="diamond"] {
+    background: linear-gradient(135deg, #00d4ff, #7c4dff);
+}
+
+.member-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.card-type {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.member-card-header i {
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
+.member-card-body {
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.member-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.member-tier {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.member-card-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.member-spending,
+.member-points {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.member-spending span,
+.member-points span {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.member-spending strong,
+.member-points strong {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.card-progress {
+    position: relative;
+    z-index: 1;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    text-align: center;
+}
+
+/* Rewards Container */
+.rewards-container {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.rewards-title {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rewards-title i {
+    color: var(--accent-color);
 }
 
 .rewards-card {
@@ -1223,8 +1924,22 @@ html {
         grid-template-columns: 1fr;
     }
 
+    .rewards-container-original {
+        grid-template-columns: 1fr;
+    }
+
     .rewards-container {
         grid-template-columns: 1fr;
+        padding: 2rem 1.5rem;
+    }
+    
+    .membership-tiers {
+        grid-template-columns: 1fr;
+    }
+    
+    .member-card-footer {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .payment-methods {

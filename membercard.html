@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Card - Coffee Cabin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-coffee"></i>
+                <span>Coffee Cabin</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html#menu" class="nav-link">Menu</a></li>
+                <li><a href="orders.html" class="nav-link">Order History</a></li>
+                <li><a href="membercard.html" class="nav-link active">Member Card</a></li>
+            </ul>
+            <div class="nav-right">
+                <a href="index.html" class="user-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Menu</span>
+                </a>
+                <div class="user-btn" id="authLink" style="cursor: pointer;">
+                    <i class="fas fa-user"></i>
+                    <span id="authText">Sign In</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Member Card Section -->
+    <section class="membercard-section">
+        <div class="container">
+            <h1 class="page-title"><i class="fas fa-id-card"></i> Thẻ Thành Viên</h1>
+            
+            <!-- Current Member Status -->
+            <div class="current-member-status">
+                <div class="member-card-display" id="memberCardDisplay">
+                    <div class="member-card-bg">
+                        <div class="member-card-header">
+                            <span class="card-type">Coffee Cabin</span>
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="member-card-body">
+                            <div class="member-name" id="memberName">Guest</div>
+                            <div class="member-tier" id="memberTier">Chưa có thẻ</div>
+                        </div>
+                        <div class="member-card-footer">
+                            <div class="member-spending">
+                                <span>Tổng chi tiêu</span>
+                                <strong id="totalSpending">0₫</strong>
+                            </div>
+                            <div class="member-points">
+                                <span>Điểm tích lũy</span>
+                                <strong id="memberPoints">0</strong>
+                            </div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <p class="progress-text" id="progressText">Đăng nhập để xem tiến độ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Member Card Tiers -->
+            <h2 class="section-title">Các Hạng Thẻ Thành Viên</h2>
+            <div class="membership-tiers">
+                <div class="tier-card" data-tier="silver">
+                    <div class="tier-badge">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3>Thẻ Bạc</h3>
+                    <p class="tier-requirement">Từ 500.000₫</p>
+                    <ul class="tier-benefits">
+                        <li><i class="fas fa-check"></i> Giảm 5% tất cả đơn hàng</li>
+                        <li><i class="fas fa-check"></i> Sinh nhật tặng 50 điểm</li>
+                        <li><i class="fas fa-check"></i> Ưu tiên hỗ trợ</li>
+                    </ul>
+                </div>
+                
+                <div class="tier-card" data-tier="gold">
+                    <div class="tier-badge">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3>Thẻ Vàng</h3>
+                    <p class="tier-requirement">Từ 3.000.000₫</p>
+                    <ul class="tier-benefits">
+                        <li><i class="fas fa-check"></i> Giảm 10% tất cả đơn hàng</li>
+                        <li><i class="fas fa-check"></i> Tích điểm x2</li>
+                        <li><i class="fas fa-check"></i> Sinh nhật tặng 100 điểm</li>
+                        <li><i class="fas fa-check"></i> Miễn phí giao hàng</li>
+                        <li><i class="fas fa-check"></i> Ưu tiên đặt trước</li>
+                    </ul>
+                </div>
+                
+                <div class="tier-card" data-tier="diamond">
+                    <div class="tier-badge">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Thẻ Kim Cương</h3>
+                    <p class="tier-requirement">Từ 10.000.000₫</p>
+                    <ul class="tier-benefits">
+                        <li><i class="fas fa-check"></i> Giảm 15% tất cả đơn hàng</li>
+                        <li><i class="fas fa-check"></i> Tích điểm x3</li>
+                        <li><i class="fas fa-check"></i> Sinh nhật tặng 200 điểm</li>
+                        <li><i class="fas fa-check"></i> Miễn phí giao hàng</li>
+                        <li><i class="fas fa-check"></i> Menu độc quyền</li>
+                        <li><i class="fas fa-check"></i> Sự kiện VIP</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Coffee Cabin. All rights reserved.</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="admin-login.html" style="color: var(--secondary-color); text-decoration: none;">
+                    <i class="fas fa-sign-in-alt"></i> Admin Login
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="membercard-script.js"></script>
+</body>
+</html>

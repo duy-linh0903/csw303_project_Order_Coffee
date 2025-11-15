@@ -72,6 +72,11 @@ function showUserMenu(event) {
                     <span>Điểm thưởng</span>
                     <i class="fas fa-chevron-right"></i>
                 </a>
+                <a href="membercard.html" class="user-menu-item">
+                    <i class="fas fa-id-card"></i>
+                    <span>Thẻ thành viên</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
                 <div class="user-menu-divider"></div>
                 <a href="#" onclick="logout(event)" class="user-menu-item user-menu-logout">
                     <i class="fas fa-sign-out-alt"></i>

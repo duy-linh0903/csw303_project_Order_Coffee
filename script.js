@@ -48,6 +48,7 @@ let currentOrderItem = null;
 let isDelivery = false;
 let deliveryFee = 23000;
 let deliveryInfo = null;
+let memberCardDiscount = 0;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserData();
     loadCart();
     renderRewards();
+    updateMemberCardCompact();
     checkLoginStatus();
 });
 
@@ -272,6 +274,66 @@ function removeFromCart(index) {
     showNotification('Item removed from cart');
 }
 
+// Get member card tier benefits
+function getMemberTierBenefits() {
+    if (!currentUser) return { 
+        tier: 'none', 
+        pointMultiplier: 1, 
+        tierName: 'Chưa có thẻ',
+        freeShipping: false,
+        birthdayBonus: 0,
+        prioritySupport: false,
+        discount: 0
+    };
+    
+    const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+    const userOrdersList = userOrders.filter(order => order.userEmail === currentUser.email);
+    const totalSpending = userOrdersList.reduce((sum, order) => sum + order.total, 0);
+    
+    if (totalSpending >= 10000000) {
+        return { 
+            tier: 'diamond', 
+            pointMultiplier: 3, 
+            tierName: 'Thẻ Kim Cương',
+            freeShipping: true,
+            birthdayBonus: 200,
+            prioritySupport: true,
+            discount: 0.15, // 15% discount
+            vipAccess: true
+        };
+    } else if (totalSpending >= 3000000) {
+        return { 
+            tier: 'gold', 
+            pointMultiplier: 2, 
+            tierName: 'Thẻ Vàng',
+            freeShipping: true,
+            birthdayBonus: 100,
+            prioritySupport: false,
+            discount: 0.10 // 10% discount
+        };
+    } else if (totalSpending >= 500000) {
+        return { 
+            tier: 'silver', 
+            pointMultiplier: 1, 
+            tierName: 'Thẻ Bạc',
+            freeShipping: false,
+            birthdayBonus: 50,
+            prioritySupport: true,
+            discount: 0.05 // 5% discount
+        };
+    }
+    
+    return { 
+        tier: 'none', 
+        pointMultiplier: 1, 
+        tierName: 'Chưa có thẻ',
+        freeShipping: false,
+        birthdayBonus: 0,
+        prioritySupport: false,
+        discount: 0
+    };
+}
+
 // Update Order Summary
 function updateOrderSummary() {
     const subtotal = cart.reduce((sum, item) => {
@@ -280,18 +342,31 @@ function updateOrderSummary() {
     }, 0);
     const tax = subtotal * 0.1;
     
+    // Get member benefits for display and discount
+    const memberBenefits = getMemberTierBenefits();
+    
+    // Apply member card discount (only Diamond tier gets 5% discount)
+    let memberDiscount = 0;
+    if (memberBenefits.discount) {
+        memberDiscount = subtotal * memberBenefits.discount;
+    }
+    
     // Calculate discount based on reward type
-    let finalDiscount = 0;
+    let finalDiscount = memberDiscount;
     if (appliedReward) {
         if (appliedReward.name === '10% Off') {
-            finalDiscount = subtotal * 0.1;
+            finalDiscount += subtotal * 0.1;
         } else {
-            finalDiscount = appliedDiscount;
+            finalDiscount += appliedDiscount;
         }
     }
     
-    // Add delivery fee if delivery is selected
-    const delivery = isDelivery ? deliveryFee : 0;
+    // Add delivery fee if delivery is selected (free for Gold and Diamond tiers)
+    let delivery = 0;
+    if (isDelivery) {
+        delivery = memberBenefits.freeShipping ? 0 : deliveryFee;
+    }
+    
     const total = Math.max(0, subtotal + tax + delivery - finalDiscount);
 
     document.getElementById('subtotal').textContent = formatVND(subtotal);
@@ -309,8 +384,9 @@ function updateOrderSummary() {
     
     document.getElementById('total').textContent = formatVND(total);
     
-    // Display applied reward
+    // Display applied reward and member discount
     displayAppliedReward();
+    displayMemberDiscount(memberBenefits);
 }
 
 // Setup Event Listeners
@@ -555,6 +631,11 @@ function showUserMenu(event) {
                 <a href="#rewards" class="user-menu-item" onclick="document.querySelector('.user-menu-overlay').remove()">
                     <i class="fas fa-gift"></i>
                     <span>Điểm thưởng</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <a href="membercard.html" class="user-menu-item">
+                    <i class="fas fa-id-card"></i>
+                    <span>Thẻ thành viên</span>
                     <i class="fas fa-chevron-right"></i>
                 </a>
                 <div class="user-menu-divider"></div>
@@ -836,7 +917,11 @@ function handlePayment() {
     const discount = parseFloat(document.getElementById('discount').textContent.replace(/[^\d]/g, ''));
     const delivery = isDelivery ? deliveryFee : 0;
     const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
-    const pointsEarned = Math.floor(total / 25000);
+    
+    // Apply member tier point multiplier
+    const memberBenefits = getMemberTierBenefits();
+    const basePoints = Math.floor(total / 25000);
+    const pointsEarned = basePoints * memberBenefits.pointMultiplier;
 
     // Create order object for admin
     const order = {
@@ -913,20 +998,27 @@ function handlePayment() {
     cart = [];
     appliedDiscount = 0;
     appliedReward = null;
+    memberCardDiscount = 0;
     guestInfo = null; // Clear guest information
     deliveryInfo = null; // Clear delivery information
     isDelivery = false; // Reset delivery flag
     updateCart();
     renderRewards(); // Re-render rewards to reset the UI
+    
+    // Update member card to reflect new spending
+    if (currentUser) {
+        updateMemberCardCompact();
+    }
 
     document.getElementById('paymentModal').style.display = 'none';
     
     // Show appropriate success message
     if (currentUser) {
+        const multiplierText = memberBenefits.pointMultiplier > 1 ? ` (x${memberBenefits.pointMultiplier})` : '';
         if (wasDelivery) {
-            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Chúng tôi sẽ giao hàng sớm. Bạn nhận được ${pointsEarned} điểm!`);
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Chúng tôi sẽ giao hàng sớm. Bạn nhận được ${pointsEarned} điểm${multiplierText}!`);
         } else {
-            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng. Bạn nhận được ${pointsEarned} điểm!`);
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng. Bạn nhận được ${pointsEarned} điểm${multiplierText}!`);
         }
     } else {
         if (wasDelivery) {
@@ -1069,6 +1161,253 @@ function displayAppliedReward() {
             </div>
         `;
         discountContainer.insertAdjacentElement('afterend', rewardInfo);
+    }
+}
+
+// Display Member Discount
+function displayMemberDiscount(memberBenefits) {
+    // Remove existing member discount info
+    const existingMemberInfo = document.querySelector('.member-discount-info');
+    if (existingMemberInfo) {
+        existingMemberInfo.remove();
+    }
+    
+    if (memberBenefits.tier !== 'none') {
+        const totalContainer = document.querySelector('.summary-total');
+        if (!totalContainer) return;
+        
+        let benefitsHTML = '';
+        
+        // Discount benefit (all tiers)
+        if (memberBenefits.discount && memberBenefits.discount > 0) {
+            const discountAmount = cart.reduce((sum, item) => {
+                const price = item.totalPrice || item.price;
+                return sum + (price * item.quantity);
+            }, 0) * memberBenefits.discount;
+            benefitsHTML += `
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-percent" style="color: var(--accent-color);"></i>
+                    <span style="color: var(--primary-color); font-weight: 600;">Giảm ${(memberBenefits.discount * 100)}%: -${formatVND(discountAmount)}</span>
+                </div>
+            `;
+        }
+        
+        // Point multiplier benefit
+        if (memberBenefits.pointMultiplier > 1) {
+            benefitsHTML += `
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-star" style="color: #ffd700;"></i>
+                    <span style="color: var(--primary-color); font-weight: 600;">Tích điểm x${memberBenefits.pointMultiplier}</span>
+                </div>
+            `;
+        }
+        
+        // Free shipping benefit
+        if (memberBenefits.freeShipping && isDelivery) {
+            benefitsHTML += `
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-shipping-fast" style="color: #4caf50;"></i>
+                    <span style="color: #4caf50; font-weight: 600;">Miễn phí giao hàng</span>
+                </div>
+            `;
+        }
+        
+        // Birthday bonus
+        if (memberBenefits.birthdayBonus > 0) {
+            benefitsHTML += `
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-birthday-cake" style="color: #ff69b4;"></i>
+                    <span style="color: #666; font-size: 0.9rem;">Sinh nhật tặng ${memberBenefits.birthdayBonus} điểm</span>
+                </div>
+            `;
+        }
+        
+        // Priority support
+        if (memberBenefits.prioritySupport) {
+            benefitsHTML += `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-headset" style="color: #2196f3;"></i>
+                    <span style="color: #666; font-size: 0.9rem;">Hỗ trợ ưu tiên</span>
+                </div>
+            `;
+        }
+        
+        if (benefitsHTML) {
+            const memberInfo = document.createElement('div');
+            memberInfo.className = 'member-discount-info';
+            memberInfo.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 1rem; border-radius: 12px; margin-top: 1rem; border-left: 4px solid var(--accent-color);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem;">
+                        <i class="fas fa-gem" style="color: var(--accent-color); font-size: 1.2rem;"></i>
+                        <strong style="color: var(--primary-color); font-size: 1.1rem;">${memberBenefits.tierName}</strong>
+                    </div>
+                    ${benefitsHTML}
+                </div>
+            `;
+            totalContainer.insertAdjacentElement('afterend', memberInfo);
+        }
+    }
+}
+
+// Update Member Card Compact (in rewards section)
+function updateMemberCardCompact() {
+    const memberCardBg = document.querySelector('.member-card-bg-compact');
+    const memberName = document.getElementById('memberNameCompact');
+    const memberTier = document.getElementById('memberTierCompact');
+    const totalSpendingEl = document.getElementById('totalSpendingCompact');
+    const memberPoints = document.getElementById('memberPointsCompact');
+    const progressFill = document.getElementById('progressFillCompact');
+    const progressText = document.getElementById('progressTextCompact');
+    const cardIcon = document.querySelector('.card-icon-compact');
+    
+    if (!memberCardBg) return;
+    
+    if (currentUser) {
+        // Calculate total spending from user orders
+        const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+        const userOrdersList = userOrders.filter(order => order.userEmail === currentUser.email);
+        const totalSpending = userOrdersList.reduce((sum, order) => sum + order.total, 0);
+        
+        // Determine tier based on spending
+        let tier = 'none';
+        let tierName = 'Chưa có thẻ';
+        let nextTier = 'Thẻ Bạc';
+        let nextTierAmount = 500000;
+        let progress = 0;
+        let iconClass = 'fa-user-circle';
+        
+        if (totalSpending >= 10000000) {
+            tier = 'diamond';
+            tierName = 'Thẻ Kim Cương';
+            nextTier = 'Thẻ Kim Cương (Đã đạt)';
+            nextTierAmount = 10000000;
+            progress = 100;
+            iconClass = 'fa-gem';
+        } else if (totalSpending >= 3000000) {
+            tier = 'gold';
+            tierName = 'Thẻ Vàng';
+            nextTier = 'Thẻ Kim Cương';
+            nextTierAmount = 10000000;
+            progress = (totalSpending / nextTierAmount) * 100;
+            iconClass = 'fa-crown';
+        } else if (totalSpending >= 500000) {
+            tier = 'silver';
+            tierName = 'Thẻ Bạc';
+            nextTier = 'Thẻ Vàng';
+            nextTierAmount = 3000000;
+            progress = (totalSpending / nextTierAmount) * 100;
+            iconClass = 'fa-medal';
+        } else {
+            progress = (totalSpending / nextTierAmount) * 100;
+            iconClass = 'fa-user-circle';
+        }
+        
+        // Update card display
+        memberName.textContent = currentUser.name;
+        memberTier.textContent = tierName;
+        totalSpendingEl.textContent = formatVND(totalSpending);
+        memberPoints.textContent = userPoints;
+        progressFill.style.width = progress + '%';
+        if (cardIcon) {
+            cardIcon.className = 'fas ' + iconClass + ' card-icon-compact';
+        }
+        
+        if (tier === 'none') {
+            progressText.textContent = `Còn ${formatVND(nextTierAmount - totalSpending)} để đạt ${nextTier}`;
+        } else if (progress < 100) {
+            progressText.textContent = `Còn ${formatVND(nextTierAmount - totalSpending)} để đạt ${nextTier}`;
+        } else {
+            progressText.textContent = 'Bạn đã đạt cấp thẻ cao nhất!';
+        }
+        
+        // Update card background based on tier
+        memberCardBg.setAttribute('data-tier', tier);
+    } else {
+        memberName.textContent = 'Guest';
+        memberTier.textContent = 'Chưa có thẻ';
+        totalSpendingEl.textContent = '0₫';
+        memberPoints.textContent = '0';
+        progressFill.style.width = '0%';
+        progressText.textContent = 'Đăng nhập để xem tiến độ';
+        if (cardIcon) {
+            cardIcon.className = 'fas fa-user-circle card-icon-compact';
+        }
+        memberCardBg.removeAttribute('data-tier');
+    }
+}
+
+// Update Member Card
+function updateMemberCard() {
+    const memberCardBg = document.querySelector('.member-card-bg');
+    const memberName = document.getElementById('memberName');
+    const memberTier = document.getElementById('memberTier');
+    const totalSpendingEl = document.getElementById('totalSpending');
+    const memberPoints = document.getElementById('memberPoints');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    
+    if (!memberCardBg) return;
+    
+    if (currentUser) {
+        // Calculate total spending from user orders
+        const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+        const userOrdersList = userOrders.filter(order => order.userEmail === currentUser.email);
+        const totalSpending = userOrdersList.reduce((sum, order) => sum + order.total, 0);
+        
+        // Determine tier based on spending
+        let tier = 'none';
+        let tierName = 'Chưa có thẻ';
+        let nextTier = 'Thẻ Bạc';
+        let nextTierAmount = 500000;
+        let progress = 0;
+        
+        if (totalSpending >= 10000000) {
+            tier = 'diamond';
+            tierName = 'Thẻ Kim Cương';
+            nextTier = 'Thẻ Kim Cương (Đã đạt)';
+            nextTierAmount = 10000000;
+            progress = 100;
+        } else if (totalSpending >= 3000000) {
+            tier = 'gold';
+            tierName = 'Thẻ Vàng';
+            nextTier = 'Thẻ Kim Cương';
+            nextTierAmount = 10000000;
+            progress = (totalSpending / nextTierAmount) * 100;
+        } else if (totalSpending >= 500000) {
+            tier = 'silver';
+            tierName = 'Thẻ Bạc';
+            nextTier = 'Thẻ Vàng';
+            nextTierAmount = 3000000;
+            progress = (totalSpending / nextTierAmount) * 100;
+        } else {
+            progress = (totalSpending / nextTierAmount) * 100;
+        }
+        
+        // Update card display
+        memberName.textContent = currentUser.name;
+        memberTier.textContent = tierName;
+        totalSpendingEl.textContent = formatVND(totalSpending);
+        memberPoints.textContent = userPoints;
+        progressFill.style.width = progress + '%';
+        
+        if (tier === 'none') {
+            progressText.textContent = `Còn ${formatVND(nextTierAmount - totalSpending)} để đạt ${nextTier}`;
+        } else if (progress < 100) {
+            progressText.textContent = `Còn ${formatVND(nextTierAmount - totalSpending)} để đạt ${nextTier}`;
+        } else {
+            progressText.textContent = 'Bạn đã đạt cấp thẻ cao nhất!';
+        }
+        
+        // Update card background based on tier
+        memberCardBg.setAttribute('data-tier', tier);
+    } else {
+        memberName.textContent = 'Guest';
+        memberTier.textContent = 'Chưa có thẻ';
+        totalSpendingEl.textContent = '0₫';
+        memberPoints.textContent = '0';
+        progressFill.style.width = '0%';
+        progressText.textContent = 'Đăng nhập để xem tiến độ';
+        memberCardBg.removeAttribute('data-tier');
     }
 }
 
