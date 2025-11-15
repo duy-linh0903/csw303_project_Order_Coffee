@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     renderMenu('all');
     setupEventListeners();
     loadUserData();
+    loadCart();
     renderRewards();
     checkLoginStatus();
 });
@@ -247,6 +248,9 @@ function updateCart() {
     }
 
     updateOrderSummary();
+    
+    // Save cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
 }
 
 // Update Cart Quantity
@@ -434,6 +438,21 @@ function loadUserData() {
             e.preventDefault();
             showUserMenu(e);
         });
+    }
+}
+
+// Load Cart from localStorage
+function loadCart() {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+        try {
+            cart = JSON.parse(savedCart);
+            updateCart();
+        } catch (error) {
+            console.error('Error loading cart:', error);
+            cart = [];
+            localStorage.removeItem('cart');
+        }
     }
 }
 

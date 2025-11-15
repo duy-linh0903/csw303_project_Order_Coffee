@@ -33,7 +33,7 @@ function checkLoginStatus() {
     if (currentUser) {
         authText.textContent = currentUser.name;
         authLink.innerHTML = `<i class="fas fa-user"></i><span>${currentUser.name}</span>`;
-        authLink.onclick = logout;
+        authLink.onclick = showUserMenu;
     } else {
         authText.textContent = 'Sign In';
         authLink.innerHTML = `<i class="fas fa-sign-in-alt"></i><span>Sign In</span>`;
@@ -41,8 +41,61 @@ function checkLoginStatus() {
     }
 }
 
+// Show User Menu
+function showUserMenu(event) {
+    event.preventDefault();
+    
+    // Get button position for dropdown placement
+    const authLink = document.getElementById('authLink');
+    const rect = authLink.getBoundingClientRect();
+    
+    const menu = `
+        <div class="user-menu-overlay" onclick="this.remove()">
+            <div class="user-menu-dropdown" style="top: ${rect.bottom + 10}px; right: 20px;" onclick="event.stopPropagation()">
+                <div class="user-menu-header">
+                    <div class="user-menu-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-menu-info">
+                        <p class="user-menu-name">${currentUser.name}</p>
+                        <p class="user-menu-email">${currentUser.email}</p>
+                    </div>
+                </div>
+                <div class="user-menu-divider"></div>
+                <a href="profile.html" class="user-menu-item">
+                    <i class="fas fa-user"></i>
+                    <span>Thông tin khách hàng</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <a href="index.html#rewards" class="user-menu-item">
+                    <i class="fas fa-gift"></i>
+                    <span>Điểm thưởng</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <div class="user-menu-divider"></div>
+                <a href="#" onclick="logout(event)" class="user-menu-item user-menu-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', menu);
+    
+    // Animate dropdown
+    setTimeout(() => {
+        const dropdown = document.querySelector('.user-menu-dropdown');
+        if (dropdown) {
+            dropdown.style.opacity = '1';
+            dropdown.style.transform = 'translateY(0)';
+        }
+    }, 10);
+}
+
 // Logout
-function logout() {
+function logout(event) {
+    if (event) event.preventDefault();
     if (confirm('Bạn có chắc muốn đăng xuất?')) {
         localStorage.removeItem('currentUser');
         sessionStorage.removeItem('currentUser');
@@ -62,6 +115,9 @@ function loadOrders() {
         allOrders = userOrders;
     }
 
+    // Sort orders by date (newest first)
+    allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+
     filteredOrders = allOrders;
     renderOrders();
 }
@@ -77,6 +133,9 @@ function filterOrderHistory(status) {
     } else {
         filteredOrders = allOrders.filter(order => order.status === status);
     }
+
+    // Sort filtered orders by date (newest first)
+    filteredOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     renderOrders();
 }
@@ -136,9 +195,14 @@ function renderOrders() {
                     <span>Tổng tiền:</span>
                     <strong>${formatVND(order.total)}</strong>
                 </div>
-                <button class="btn-view-detail">
-                    <i class="fas fa-eye"></i> Chi tiết
-                </button>
+                <div class="order-actions">
+                    <button class="btn-reorder" onclick="event.stopPropagation(); reorderItems('${order.id}');">
+                        <i class="fas fa-redo"></i> Đặt lại
+                    </button>
+                    <button class="btn-view-detail">
+                        <i class="fas fa-eye"></i> Chi tiết
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');
@@ -258,6 +322,11 @@ function viewOrderDetail(orderId) {
                         <span>${getPaymentMethodText(order.paymentMethod)}</span>
                     </div>
                 </div>
+                <div class="modal-actions">
+                    <button class="btn-reorder-modal" onclick="reorderItems('${order.id}'); closeOrderDetail();">
+                        <i class="fas fa-redo"></i> Đặt lại đơn hàng này
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -289,6 +358,71 @@ function updateStats() {
     document.getElementById('totalOrdersCount').textContent = totalOrders;
     document.getElementById('totalSpent').textContent = formatVND(totalSpent);
     document.getElementById('totalPoints').textContent = totalPoints;
+}
+
+// Re-order Items
+function reorderItems(orderId) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (!order) {
+        alert('Đơn hàng không tồn tại!');
+        return;
+    }
+
+    if (confirm(`Bạn có muốn thêm ${order.items.length} món từ đơn hàng #${order.id} vào giỏ hàng?`)) {
+        // Get current cart from localStorage
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        
+        // Add all items from the order to cart with proper structure
+        order.items.forEach(item => {
+            const cartItem = {
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                customizations: item.customizations || null,
+                totalPrice: item.totalPrice || item.price,
+                uniqueId: Date.now() + Math.random() // Generate unique ID for each item
+            };
+            cart.push(cartItem);
+        });
+        
+        // Save updated cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+        
+        // Show success message
+        showReorderNotification(`Đã thêm ${order.items.length} món vào giỏ hàng!`);
+        
+        // Redirect to menu page after a short delay
+        setTimeout(() => {
+            window.location.href = 'index.html#menu';
+        }, 1500);
+    }
+}
+
+// Show Reorder Notification
+function showReorderNotification(message) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'reorder-notification';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Trigger animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
 }
 
 // Close modal when clicking outside
