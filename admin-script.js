@@ -607,15 +607,118 @@ function deleteCustomer(email) {
 
 // Logout
 function logout() {
-    if (confirm('Are you sure you want to logout?')) {
+    showLogoutModal();
+}
+
+function showLogoutModal() {
+    const modal = document.createElement('div');
+    modal.id = 'logoutModalAdmin';
+    modal.style.cssText = `
+        display: block;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            position: relative;
+            background-color: white;
+            margin: 15% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease-out;
+        ">
+            <div style="
+                padding: 1.5rem;
+                background: linear-gradient(135deg, #ff6b6b, #ff8787);
+                color: white;
+                border-radius: 15px 15px 0 0;
+                text-align: center;
+            ">
+                <i class="fas fa-sign-out-alt" style="font-size: 3rem; margin-bottom: 0.5rem;"></i>
+                <h2 style="margin: 0; font-size: 1.5rem;">Confirm Logout</h2>
+            </div>
+            <div style="
+                padding: 2rem;
+                text-align: center;
+                font-size: 1.1rem;
+                color: #2c1810;
+            ">
+                <p>Are you sure you want to logout from admin panel?</p>
+            </div>
+            <div style="
+                padding: 1rem 1.5rem 1.5rem;
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+            ">
+                <button onclick="closeLogoutModal()" style="
+                    padding: 0.75rem 2rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    background-color: #e0e0e0;
+                    color: #2c1810;
+                    transition: all 0.3s;
+                ">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button onclick="confirmLogout()" style="
+                    padding: 0.75rem 2rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    background-color: #ff6b6b;
+                    color: white;
+                    transition: all 0.3s;
+                ">
+                    <i class="fas fa-check"></i> Logout
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.onclick = function(event) {
+        if (event.target === modal) {
+            closeLogoutModal();
+        }
+    };
+}
+
+function closeLogoutModal() {
+    const modal = document.getElementById('logoutModalAdmin');
+    if (modal) modal.remove();
+}
+
+function confirmLogout() {
+    closeLogoutModal();
+    showNotification('Logged out successfully!');
+    
+    setTimeout(() => {
         // Clear admin session
         localStorage.removeItem('adminSession');
         sessionStorage.removeItem('adminSession');
         
         // Redirect to login page
         window.location.href = 'admin-login.html';
-    }
+    }, 1500);
 }
+
 
 // Show Notification
 function showNotification(message) {
