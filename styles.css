@@ -1,5 +1,5 @@
 html {
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
     scroll-behavior: smooth;
 }
 
@@ -44,16 +44,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-html {
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
 }
 
 /* Navigation */
@@ -62,7 +57,8 @@ html {
     box-shadow: var(--shadow);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 999;
+    transform: translateZ(0); 
 }
 
 .navbar .container {
@@ -115,6 +111,7 @@ html {
 }
 
 .nav-right {
+    position: relative; /* Cần thiết để định vị dropdown */
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -171,6 +168,90 @@ html {
     font-size: 0.75rem;
     font-weight: bold;
 }
+/* --- CSS CHO NÚT THÔNG BÁO --- */
+
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: var(--text-color); /* Hoặc màu bạn muốn */
+}
+
+.notify-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: var(--accent-color, red); /* Dùng màu đỏ làm nổi bật */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 2px 6px;
+    display: none; /* Mặc định ẩn, chỉ hiện khi có thông báo */
+}
+
+/* Hiện số đếm khi nó lớn hơn 0 */
+.notify-count.show {
+    display: block;
+}
+
+
+/* --- CSS CHO KHUNG DROPDOWN THÔNG BÁO --- */
+.notification-dropdown {
+    position: absolute;
+    top: 100%; /* Nằm ngay dưới thanh nav */
+    right: 0; /* Căn lề phải */
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    margin-top: 10px; /* Khoảng cách với nút */
+
+    /* Mặc định ẩn đi */
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Lớp 'active' (được thêm bằng JS) để hiện dropdown */
+.notification-dropdown.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification-dropdown h4 {
+    padding: 1rem;
+    margin: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-dropdown li {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.notification-dropdown li:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown li.no-notification {
+    text-align: center;
+    color: #999;
+}
+/* --- KẾT THÚC CSS THÔNG BÁO --- */
 
 /* Hero Section */
 .hero {
@@ -181,6 +262,7 @@ html {
     animation: fadeInUp 0.8s ease-out;
     position: relative;
     overflow: hidden;
+    z-index: 0;
 }
 
 .hero::before {
@@ -319,6 +401,8 @@ html {
     padding: 80px 0;
     animation: fadeInUp 0.8s ease-out;
     overflow-x: hidden;
+    position: relative; 
+    z-index: 0;
 }
 
 .menu-filter {
