@@ -434,7 +434,36 @@ function setupEventListeners() {
         isDelivery = true;
         showDeliveryModal();
     });
+    // --- BẮT ĐẦU CODE THÔNG BÁO ---
+    // Lấy các phần tử HTML cho thông báo
+    const notifyButton = document.getElementById('notificationButton');
+    const notifyDropdown = document.getElementById('notificationDropdown');
+
+    // Kiểm tra xem các phần tử có tồn tại không (vì nó chỉ có trên index.html)
+    if (notifyButton && notifyDropdown) {
+        
+        // Thêm sự kiện "click" cho nút thông báo (biểu tượng chuông)
+        notifyButton.addEventListener('click', function(event) {
+            // Ngăn việc click vào nút làm ẩn luôn dropdown (nếu đang mở)
+            event.stopPropagation(); 
+            
+            // Bật/tắt hiển thị dropdown bằng cách thêm/xóa class 'active'
+            notifyDropdown.classList.toggle('active');
+        });
+
+        // Thêm sự kiện "click" vào bất cứ đâu trên trang
+        window.addEventListener('click', function(event) {
+            // Nếu dropdown đang hiển thị (có class 'active') VÀ
+            // người dùng không click vào bên trong dropdown
+            if (notifyDropdown.classList.contains('active') && !notifyDropdown.contains(event.target)) {
+                // Thì ẩn dropdown đi
+                notifyDropdown.classList.remove('active');
+            }
+        });
+    }
+    // --- KẾT THÚC CODE THÔNG BÁO ---
 }
+
 
 // Setup Modal Listeners
 function setupModalListeners() {
