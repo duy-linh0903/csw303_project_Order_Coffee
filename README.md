@@ -138,9 +138,7 @@ Order_Coffee/
 ├── .gitignore                    # Git ignore file
 ├── package.json                  # NPM configuration
 ├── LICENSE                       # MIT License
-├── README.md                     # Documentation
-├── CHANGELOG.md                  # Version history
-└── CONTRIBUTING.md               # Contribution guidelines
+└── README.md                     # Documentation (file duy nhất)
 ```
 
 ## 🚀 Cài Đặt
