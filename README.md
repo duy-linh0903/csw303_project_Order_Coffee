@@ -48,7 +48,7 @@ Hệ thống đặt hàng coffee trực tuyến với giao diện hiện đại,
 
 ### 🎁 Hệ Thống Điểm Thưởng
 - **Tích điểm**: 
-  - 1 điểm cho mỗi 10.000₫ chi tiêu
+  - 1 điểm cho mỗi 10.000₫ chi tiêu (cập nhật mới)
   - Nhân điểm theo hạng thẻ (x2 cho Vàng, x3 cho Kim Cương)
 - **Đổi thưởng**:
   - 10% Off (100 điểm)

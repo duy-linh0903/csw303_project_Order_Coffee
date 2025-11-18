@@ -1050,7 +1050,7 @@ function handlePayment() {
     
     // Apply member tier point multiplier
     const memberBenefits = getMemberTierBenefits();
-    const basePoints = Math.floor(total / 25000);
+    const basePoints = Math.floor(total / 10000);
     const pointsEarned = basePoints * memberBenefits.pointMultiplier;
 
     // Create order object for admin
