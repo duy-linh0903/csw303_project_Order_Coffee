@@ -34,7 +34,7 @@ function checkLoginStatus() {
     } else {
         authText.textContent = 'Sign In';
         authLink.innerHTML = `<i class="fas fa-sign-in-alt"></i><span>Sign In</span>`;
-        authLink.onclick = () => window.location.href = 'admin-login.html';
+        authLink.onclick = () => window.location.href = '../admin/login.html';
     }
 }
 
@@ -64,7 +64,7 @@ function showUserMenu(event) {
                     <span>Thông tin khách hàng</span>
                     <i class="fas fa-chevron-right"></i>
                 </a>
-                <a href="index.html#rewards" class="user-menu-item">
+                <a href="../index.html#rewards" class="user-menu-item">
                     <i class="fas fa-gift"></i>
                     <span>Điểm thưởng</span>
                     <i class="fas fa-chevron-right"></i>
@@ -203,7 +203,7 @@ function confirmLogout() {
     setTimeout(() => {
         localStorage.removeItem('currentUser');
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+        window.location.href = '../index.html';
     }, 1500);
 }
 

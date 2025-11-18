@@ -37,7 +37,7 @@ function checkLoginStatus() {
     } else {
         authText.textContent = 'Sign In';
         authLink.innerHTML = `<i class="fas fa-sign-in-alt"></i><span>Sign In</span>`;
-        authLink.onclick = () => window.location.href = 'admin-login.html';
+        authLink.onclick = () => window.location.href = '../admin/login.html';
     }
 }
 
@@ -67,7 +67,7 @@ function showUserMenu(event) {
                     <span>Thông tin khách hàng</span>
                     <i class="fas fa-chevron-right"></i>
                 </a>
-                <a href="index.html#rewards" class="user-menu-item">
+                <a href="../index.html#rewards" class="user-menu-item">
                     <i class="fas fa-gift"></i>
                     <span>Điểm thưởng</span>
                     <i class="fas fa-chevron-right"></i>
@@ -206,7 +206,7 @@ function confirmLogout() {
     setTimeout(() => {
         localStorage.removeItem('currentUser');
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+        window.location.href = '../index.html';
     }, 1500);
 }
 
@@ -257,7 +257,7 @@ function renderOrders() {
                 <i class="fas fa-receipt" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
                 <h3 style="color: #999;">Chưa có đơn hàng nào</h3>
                 <p style="color: #999;">Hãy đặt đơn hàng đầu tiên của bạn!</p>
-                <a href="index.html" class="btn-primary" style="margin-top: 1rem; display: inline-block; text-decoration: none;">
+                <a href="../index.html" class="btn-primary" style="margin-top: 1rem; display: inline-block; text-decoration: none;">
                     <i class="fas fa-coffee"></i> Đặt hàng ngay
                 </a>
             </div>
@@ -501,7 +501,7 @@ function reorderItems(orderId) {
         
         // Redirect to menu page after a short delay
         setTimeout(() => {
-            window.location.href = 'index.html#menu';
+            window.location.href = '../index.html#menu';
         }, 1500);
     }
 }

@@ -42,7 +42,7 @@ function checkAuth() {
     
     if (!adminSession) {
         // Not logged in, redirect to login page
-        window.location.href = 'admin-login.html';
+        window.location.href = 'login.html';
         return false;
     }
     
@@ -62,7 +62,7 @@ function checkAuth() {
         // Invalid session, redirect to login
         localStorage.removeItem('adminSession');
         sessionStorage.removeItem('adminSession');
-        window.location.href = 'admin-login.html';
+        window.location.href = 'login.html';
         return false;
     }
 }
@@ -715,7 +715,7 @@ function confirmLogout() {
         sessionStorage.removeItem('adminSession');
         
         // Redirect to login page
-        window.location.href = 'admin-login.html';
+        window.location.href = 'login.html';
     }, 1500);
 }
 

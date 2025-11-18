@@ -858,7 +858,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
-            <a href="index.html" class="nav-brand">
+            <a href="../index.html" class="nav-brand">
                 <i class="fas fa-coffee"></i>
                 <span>Coffee Cabin</span>
             </a>
@@ -867,7 +867,7 @@
                     <i class="fas fa-receipt"></i>
                     Order History
                 </a>
-                <a href="index.html" class="back-btn">
+                <a href="../index.html" class="back-btn">
                     <i class="fas fa-arrow-left"></i>
                     Back to Home
                 </a>
@@ -933,7 +933,7 @@
                     <i class="fas fa-info-circle"></i> Kiếm 1 điểm cho mỗi 25.000₫ chi tiêu
                 </p>
                 <p style="text-align: center; margin-top: 0.5rem;">
-                    <a href="index.html#rewards" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                    <a href="../index.html#rewards" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
                         <i class="fas fa-arrow-right"></i> View Available Rewards
                     </a>
                 </p>
@@ -1066,7 +1066,7 @@
             if (!savedUser) {
                 showNotification('Please sign in to view your profile');
                 setTimeout(() => {
-                    window.location.href = 'admin-login.html';
+                    window.location.href = '../admin/login.html';
                 }, 2000);
                 return;
             }
@@ -1149,7 +1149,7 @@
                         <i class="fas fa-shopping-bag"></i>
                         <p>No orders yet</p>
                         <p style="margin-top: 1rem;">
-                            <a href="index.html#menu" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                            <a href="../index.html#menu" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
                                 <i class="fas fa-arrow-right"></i> Start Ordering
                             </a>
                         </p>
@@ -1372,7 +1372,7 @@
             setTimeout(() => {
                 localStorage.removeItem('currentUser');
                 sessionStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
+                window.location.href = '../index.html';
             }, 1500);
         }
 

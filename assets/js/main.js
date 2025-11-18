@@ -652,7 +652,7 @@ function showUserMenu(event) {
                     </div>
                 </div>
                 <div class="user-menu-divider"></div>
-                <a href="profile.html" class="user-menu-item">
+                <a href="pages/profile.html" class="user-menu-item">
                     <i class="fas fa-user"></i>
                     <span>Thông tin khách hàng</span>
                     <i class="fas fa-chevron-right"></i>
@@ -662,7 +662,7 @@ function showUserMenu(event) {
                     <span>Điểm thưởng</span>
                     <i class="fas fa-chevron-right"></i>
                 </a>
-                <a href="membercard.html" class="user-menu-item">
+                <a href="pages/membercard.html" class="user-menu-item">
                     <i class="fas fa-id-card"></i>
                     <span>Thẻ thành viên</span>
                     <i class="fas fa-chevron-right"></i>
@@ -801,7 +801,7 @@ function confirmLogout() {
         <i class="fas fa-user"></i>
         <span>Sign In</span>
     `;
-    signInBtn.href = 'admin-login.html';
+    signInBtn.href = 'admin/login.html';
     
     // Remove old event listeners by cloning
     const newSignInBtn = signInBtn.cloneNode(true);
@@ -900,7 +900,7 @@ function redirectToLoginWithCart() {
     closeGuestWarningModal();
     
     // Redirect to login page
-    window.location.href = 'admin-login.html?redirect=checkout';
+    window.location.href = 'admin/login.html?redirect=checkout';
 }
 
 // Continue as Guest
@@ -1198,7 +1198,7 @@ function renderRewards() {
 function redeemReward(rewardId) {
     if (!currentUser) {
         showNotification('Please sign in to redeem rewards!');
-        window.location.href = 'admin-login.html';
+        window.location.href = 'admin/login.html';
         return;
     }
 

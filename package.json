@@ -1,0 +1,27 @@
+{
+  "name": "coffee-cabin",
+  "version": "1.0.0",
+  "description": "Modern coffee ordering system with member card tiers",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000 --open=index.html",
+    "dev": "live-server --port=3000",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "coffee",
+    "ordering-system",
+    "ecommerce",
+    "member-card",
+    "loyalty-program"
+  ],
+  "author": "Duy Linh",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/duy-linh0903/csw303_project_Order_Coffee.git"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

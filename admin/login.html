@@ -345,7 +345,7 @@
             </div>
 
             <div class="back-home">
-                <a href="index.html">
+                <a href="../index.html">
                     <i class="fas fa-arrow-left"></i> Back to Home
                 </a>
             </div>
@@ -435,7 +435,7 @@
 
                 // Redirect to admin dashboard
                 setTimeout(() => {
-                    window.location.href = 'admin.html';
+                    window.location.href = 'index.html';
                 }, 1000);
             } else {
                 // Check regular user accounts
@@ -465,7 +465,7 @@
 
                     // Redirect to home page
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = '../index.html';
                     }, 1000);
                 } else {
                     // Show error message
@@ -539,7 +539,7 @@
                 </div>
 
                 <div class="back-home">
-                    <a href="index.html">
+                    <a href="../index.html">
                         <i class="fas fa-arrow-left"></i> Back to Home
                     </a>
                 </div>
@@ -624,8 +624,8 @@
 
                 // Redirect to home page
                 setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
+                    window.location.href = '../index.html';
+                }, 1000);
             });
 
             // Back to login
@@ -641,9 +641,9 @@
             const userSession = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
             
             if (adminSession) {
-                window.location.href = 'admin.html';
-            } else if (userSession) {
                 window.location.href = 'index.html';
+            } else if (userSession) {
+                window.location.href = '../index.html';
             }
         });
     </script>
