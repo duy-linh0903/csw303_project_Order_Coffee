@@ -623,7 +623,7 @@ function restorePendingCart() {
         
         // Auto open payment modal after a short delay
         setTimeout(() => {
-            const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+            const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
             if (total > 0) {
                 const paymentModal = document.getElementById('paymentModal');
                 document.getElementById('paymentTotal').textContent = formatVND(total);
@@ -837,7 +837,7 @@ function openPaymentModal() {
     }
 
     const paymentModal = document.getElementById('paymentModal');
-    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+    const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
     paymentModal.style.display = 'block';
 }
@@ -1014,14 +1014,14 @@ function closeDeliveryModal() {
 
 function openPaymentModalAfterGuestInfo() {
     const paymentModal = document.getElementById('paymentModal');
-    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+    const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
     paymentModal.style.display = 'block';
 }
 
 function openPaymentModalWithDelivery() {
     const paymentModal = document.getElementById('paymentModal');
-    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+    const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
     paymentModal.style.display = 'block';
 }
@@ -1041,12 +1041,12 @@ function handlePayment() {
         }
     }
 
-    // Process payment
-    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^\d]/g, ''));
-    const tax = parseFloat(document.getElementById('tax').textContent.replace(/[^\d]/g, ''));
-    const discount = parseFloat(document.getElementById('discount').textContent.replace(/[^\d]/g, ''));
+    // Process payment - Parse Vietnamese formatted numbers (e.g., "979.687,5₫" becomes 979687.5)
+    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+    const tax = parseFloat(document.getElementById('tax').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+    const discount = parseFloat(document.getElementById('discount').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     const delivery = isDelivery ? deliveryFee : 0;
-    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, ''));
+    const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     
     // Apply member tier point multiplier
     const memberBenefits = getMemberTierBenefits();
