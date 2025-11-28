@@ -56,6 +56,75 @@
         </div>
     </section>
 
+    <!-- Promotion Banners Section -->
+    <section class="promotion-section">
+        <div class="container">
+            <div class="promotion-slider">
+                <div class="promotion-banner active">
+                    <div class="banner-content">
+                        <div class="banner-text">
+                            <span class="banner-tag">🎉 KHUYẾN MÃI ĐẶC BIỆT</span>
+                            <h3>Giảm 30% cho thành viên mới</h3>
+                            <p>Đăng ký ngay hôm nay và nhận ưu đãi hấp dẫn cho đơn hàng đầu tiên!</p>
+                            <button class="banner-btn" onclick="window.location.href='admin/login.html?register=true'">Đăng ký ngay</button>
+                        </div>
+                        <div class="banner-image">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="promotion-banner">
+                    <div class="banner-content">
+                        <div class="banner-text">
+                            <span class="banner-tag">☕ ĐỒ UỐNG MỚI</span>
+                            <h3>Caramel Macchiato - Vị ngọt đặc biệt</h3>
+                            <p>Hương vị vanilla kết hợp caramel tuyệt hảo. Thử ngay hôm nay!</p>
+                            <button class="banner-btn" onclick="scrollToMenu()">Xem menu</button>
+                        </div>
+                        <div class="banner-image">
+                            <i class="fas fa-mug-hot"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="promotion-banner">
+                    <div class="banner-content">
+                        <div class="banner-text">
+                            <span class="banner-tag">🌟 TÍCH ĐIỂM THƯỞNG</span>
+                            <h3>Nhận điểm với mỗi đơn hàng</h3>
+                            <p>Tích điểm để đổi đồ uống miễn phí và nhiều ưu đãi khác!</p>
+                            <button class="banner-btn" onclick="window.location.href='pages/membercard.html'">Xem thêm</button>
+                        </div>
+                        <div class="banner-image">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="promotion-banner">
+                    <div class="banner-content">
+                        <div class="banner-text">
+                            <span class="banner-tag">🚚 MIỄN PHÍ GIAO HÀNG</span>
+                            <h3>Free Ship cho thành viên Gold & Diamond</h3>
+                            <p>Nâng cấp thành viên để nhận ưu đãi giao hàng miễn phí!</p>
+                            <button class="banner-btn" onclick="window.location.href='pages/membercard.html'">Nâng cấp ngay</button>
+                        </div>
+                        <div class="banner-image">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <button class="slider-btn prev" onclick="changeBanner(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="slider-dots" id="sliderDots"></div>
+                <button class="slider-btn next" onclick="changeBanner(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- Menu Section -->
     <section id="menu" class="menu-section">
         <div class="container">
@@ -415,6 +484,15 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Discount Codes Section -->
+                <div class="discount-codes-section">
+                    <h3><i class="fas fa-tag"></i> Mã giảm giá khả dụng</h3>
+                    <div id="availableDiscountCodes" class="discount-codes-list">
+                        <!-- Discount codes will be loaded here -->
+                    </div>
+                </div>
+                
                 <div class="payment-total">
                     <span>Total Amount:</span>
                     <span id="paymentTotal">0₫</span>

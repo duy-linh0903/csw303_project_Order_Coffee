@@ -364,6 +364,111 @@
     background: var(--dark-color);
 }
 
+/* Cart Discount Suggestions */
+.cart-discount-suggestions {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cart-discount-item {
+    background: white;
+    padding: 0.875rem;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-discount-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    transform: translateY(-1px);
+}
+
+.cart-discount-item.applied {
+    border-color: #4caf50;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.cart-discount-item.expired {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cart-discount-item.expired:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.cart-discount-left {
+    flex: 1;
+}
+
+.cart-discount-code {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-discount-code i {
+    font-size: 0.85rem;
+}
+
+.cart-discount-desc {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+}
+
+.cart-discount-expiry {
+    font-size: 0.7rem;
+    color: #999;
+    font-style: italic;
+}
+
+.cart-discount-expiry.expired {
+    color: #f44336;
+}
+
+.cart-discount-apply-btn {
+    padding: 0.4rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.cart-discount-apply-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.cart-discount-apply-btn.applied {
+    background: #4caf50;
+}
+
+.cart-no-discounts {
+    text-align: center;
+    padding: 0.75rem;
+    color: #999;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
 /* Points Redemption Section */
 .points-header {
     display: flex;
@@ -612,6 +717,126 @@
 }
 
 /* Button styles inherited from main.css */
+
+/* Discount Codes Section */
+.discount-codes-section {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+}
+
+.discount-codes-section h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.discount-codes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.discount-code-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.discount-code-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+.discount-code-item.applied {
+    border-color: #4caf50;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.discount-code-info {
+    flex: 1;
+}
+
+.discount-code-name {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.discount-code-description {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.discount-code-expiry {
+    font-size: 0.75rem;
+    color: #999;
+    font-style: italic;
+}
+
+.discount-code-expiry.expired {
+    color: #f44336;
+}
+
+.apply-code-btn {
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.apply-code-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.apply-code-btn.applied {
+    background: #4caf50;
+}
+
+.discount-code-item.expired {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.discount-code-item.expired .apply-code-btn {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.discount-code-item.expired:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.no-discount-codes {
+    text-align: center;
+    padding: 1rem;
+    color: #999;
+    font-style: italic;
+}
 
 /* Delivery Option Styling */
 .delivery-option {

@@ -60,7 +60,79 @@ document.addEventListener('DOMContentLoaded', function() {
     renderRewards();
     updateMemberCardCompact();
     checkLoginStatus();
+    initPromotionSlider();
+    loadNotifications();
 });
+
+// Promotion Banner Slider
+let currentBannerIndex = 0;
+let bannerInterval;
+
+function initPromotionSlider() {
+    const banners = document.querySelectorAll('.promotion-banner');
+    const dotsContainer = document.getElementById('sliderDots');
+    
+    // Create dots
+    banners.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = `slider-dot ${index === 0 ? 'active' : ''}`;
+        dot.onclick = () => goToBanner(index);
+        dotsContainer.appendChild(dot);
+    });
+    
+    // Auto slide every 5 seconds
+    startAutoSlide();
+}
+
+function startAutoSlide() {
+    bannerInterval = setInterval(() => {
+        changeBanner(1);
+    }, 5000);
+}
+
+function stopAutoSlide() {
+    clearInterval(bannerInterval);
+}
+
+function changeBanner(direction) {
+    const banners = document.querySelectorAll('.promotion-banner');
+    const dots = document.querySelectorAll('.slider-dot');
+    
+    // Remove active class
+    banners[currentBannerIndex].classList.remove('active');
+    dots[currentBannerIndex].classList.remove('active');
+    
+    // Calculate new index
+    currentBannerIndex = (currentBannerIndex + direction + banners.length) % banners.length;
+    
+    // Add active class
+    banners[currentBannerIndex].classList.add('active');
+    dots[currentBannerIndex].classList.add('active');
+    
+    // Reset auto slide
+    stopAutoSlide();
+    startAutoSlide();
+}
+
+function goToBanner(index) {
+    const banners = document.querySelectorAll('.promotion-banner');
+    const dots = document.querySelectorAll('.slider-dot');
+    
+    // Remove active class
+    banners[currentBannerIndex].classList.remove('active');
+    dots[currentBannerIndex].classList.remove('active');
+    
+    // Set new index
+    currentBannerIndex = index;
+    
+    // Add active class
+    banners[currentBannerIndex].classList.add('active');
+    dots[currentBannerIndex].classList.add('active');
+    
+    // Reset auto slide
+    stopAutoSlide();
+    startAutoSlide();
+}
 
 // Render Menu
 function renderMenu(filter) {
@@ -361,6 +433,11 @@ function updateOrderSummary() {
         }
     }
     
+    // Add discount from promo codes (memberCardDiscount stores percentage like 0.3 for 30%)
+    if (memberCardDiscount > 0) {
+        finalDiscount += subtotal * memberCardDiscount;
+    }
+    
     // Add delivery fee if delivery is selected (free for Gold and Diamond tiers)
     let delivery = 0;
     if (isDelivery) {
@@ -464,6 +541,169 @@ function setupEventListeners() {
     // --- KẾT THÚC CODE THÔNG BÁO ---
 }
 
+// Load and Display Notifications
+function loadNotifications() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'null');
+    if (!currentUser) return;
+
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const userNotifications = notifications.filter(n => n.userEmail === currentUser.email);
+    
+    const notificationList = document.getElementById('notificationList');
+    const notificationCount = document.getElementById('notificationCount');
+    
+    if (!notificationList || !notificationCount) return;
+
+    // Update count
+    const unreadCount = userNotifications.filter(n => !n.isRead).length;
+    notificationCount.textContent = unreadCount;
+    notificationCount.style.display = unreadCount > 0 ? 'block' : 'none';
+
+    // Display notifications
+    if (userNotifications.length === 0) {
+        notificationList.innerHTML = '<li class="no-notification">Chưa có thông báo nào</li>';
+    } else {
+        notificationList.innerHTML = userNotifications.map(notif => `
+            <li class="notification-item ${notif.isRead ? 'read' : 'unread'}" onclick="handleNotificationClick('${notif.id}')">
+                <div class="notification-content">
+                    <h4>${notif.title}</h4>
+                    <p>${notif.message}</p>
+                    ${notif.type === 'promotion' && notif.code ? `
+                        <button class="use-code-btn" onclick="event.stopPropagation(); applyDiscountCode('${notif.code}', ${notif.discount})">
+                            <i class="fas fa-tag"></i> Sử dụng mã
+                        </button>
+                    ` : ''}
+                    <span class="notification-time">${formatNotificationTime(notif.createdAt)}</span>
+                </div>
+            </li>
+        `).join('');
+    }
+}
+
+// Handle notification click
+function handleNotificationClick(notifId) {
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const notifIndex = notifications.findIndex(n => n.id === notifId);
+    
+    if (notifIndex !== -1 && !notifications[notifIndex].isRead) {
+        notifications[notifIndex].isRead = true;
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        loadNotifications();
+    }
+}
+
+// Apply discount code from notification
+function applyDiscountCode(code, discountPercent) {
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const notif = notifications.find(n => n.code === code);
+    
+    // Check if code is expired
+    if (notif && new Date(notif.expiryDate) < new Date()) {
+        showNotification('Mã giảm giá đã hết hạn!');
+        return;
+    }
+    
+    // Apply discount (store as percentage for calculation later)
+    memberCardDiscount = discountPercent;
+    updateOrderSummary();
+    
+    // Close notification dropdown
+    const notifyDropdown = document.getElementById('notificationDropdown');
+    if (notifyDropdown) {
+        notifyDropdown.classList.remove('active');
+    }
+    
+    showNotification(`Đã áp dụng mã giảm giá ${code} - Giảm ${(discountPercent * 100)}%!`);
+}
+
+// Format notification time
+function formatNotificationTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000); // seconds
+    
+    if (diff < 60) return 'Vừa xong';
+    if (diff < 3600) return Math.floor(diff / 60) + ' phút trước';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' giờ trước';
+    if (diff < 604800) return Math.floor(diff / 86400) + ' ngày trước';
+    return date.toLocaleDateString('vi-VN');
+}
+
+// Load Available Discount Codes
+function loadAvailableDiscountCodes() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'null');
+    if (!currentUser) return;
+
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const userDiscounts = notifications.filter(n => 
+        n.userEmail === currentUser.email && 
+        n.type === 'promotion' && 
+        n.code
+    );
+    
+    const discountCodesContainer = document.getElementById('availableDiscountCodes');
+    if (!discountCodesContainer) return;
+
+    if (userDiscounts.length === 0) {
+        discountCodesContainer.innerHTML = '<div class="no-discount-codes">Hiện không có mã giảm giá khả dụng</div>';
+        return;
+    }
+
+    discountCodesContainer.innerHTML = userDiscounts.map(discount => {
+        const expiryDate = new Date(discount.expiryDate);
+        const isExpired = expiryDate < new Date();
+        const isApplied = appliedDiscount === discount.discount;
+        
+        return `
+            <div class="discount-code-item ${isExpired ? 'expired' : ''} ${isApplied ? 'applied' : ''}" 
+                 onclick="${isExpired ? '' : `applyDiscountCodeFromModal('${discount.code}', ${discount.discount})`}">
+                <div class="discount-code-info">
+                    <div class="discount-code-name">
+                        <i class="fas fa-tag"></i>
+                        ${discount.code}
+                        ${isApplied ? '<i class="fas fa-check-circle" style="color: #4caf50;"></i>' : ''}
+                    </div>
+                    <div class="discount-code-description">
+                        Giảm ${(discount.discount * 100)}% cho đơn hàng
+                    </div>
+                    <div class="discount-code-expiry ${isExpired ? 'expired' : ''}">
+                        ${isExpired ? 'Đã hết hạn' : 'Hết hạn: ' + expiryDate.toLocaleDateString('vi-VN')}
+                    </div>
+                </div>
+                <button class="apply-code-btn ${isApplied ? 'applied' : ''}" 
+                        onclick="event.stopPropagation(); ${isExpired ? '' : `applyDiscountCodeFromModal('${discount.code}', ${discount.discount})`}"
+                        ${isExpired ? 'disabled' : ''}>
+                    ${isApplied ? '<i class="fas fa-check"></i> Đã áp dụng' : '<i class="fas fa-tag"></i> Áp dụng'}
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Apply discount code from modal
+function applyDiscountCodeFromModal(code, discountPercent) {
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const notif = notifications.find(n => n.code === code);
+    
+    // Check if code is expired
+    if (notif && new Date(notif.expiryDate) < new Date()) {
+        showNotification('Mã giảm giá đã hết hạn!');
+        return;
+    }
+    
+    // Apply discount (store as percentage like 0.3 for 30%)
+    memberCardDiscount = discountPercent;
+    updateOrderSummary();
+    
+    // Update payment modal total
+    const newTotal = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+    document.getElementById('paymentTotal').textContent = formatVND(newTotal);
+    
+    // Reload discount codes to update UI
+    loadAvailableDiscountCodes();
+    
+    showNotification(`Đã áp dụng mã giảm giá ${code} - Giảm ${(discountPercent * 100)}%!`);
+}
 
 // Setup Modal Listeners
 function setupModalListeners() {
@@ -839,6 +1079,7 @@ function openPaymentModal() {
     const paymentModal = document.getElementById('paymentModal');
     const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
+    loadAvailableDiscountCodes();
     paymentModal.style.display = 'block';
 }
 
@@ -1016,6 +1257,7 @@ function openPaymentModalAfterGuestInfo() {
     const paymentModal = document.getElementById('paymentModal');
     const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
+    loadAvailableDiscountCodes();
     paymentModal.style.display = 'block';
 }
 
@@ -1023,6 +1265,7 @@ function openPaymentModalWithDelivery() {
     const paymentModal = document.getElementById('paymentModal');
     const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
+    loadAvailableDiscountCodes();
     paymentModal.style.display = 'block';
 }
 

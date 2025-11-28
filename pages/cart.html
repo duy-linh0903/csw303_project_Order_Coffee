@@ -90,6 +90,10 @@
                             <input type="text" class="promo-input" id="promoCode" placeholder="Nhập mã giảm giá">
                             <button class="apply-promo-btn" onclick="applyPromoCode()">Áp Dụng</button>
                         </div>
+                        <!-- Available Discount Codes -->
+                        <div id="cartAvailableDiscounts" class="cart-discount-suggestions">
+                            <!-- Discount codes will be loaded here -->
+                        </div>
                     </div>
 
                     <!-- Summary -->
@@ -180,6 +184,14 @@
                 <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid var(--primary-color); font-size: 1.2rem; font-weight: bold;">
                     <span>Tổng cộng:</span>
                     <span id="checkoutTotal">0₫</span>
+                </div>
+            </div>
+
+            <!-- Discount Codes Section -->
+            <div class="discount-codes-section">
+                <h3><i class="fas fa-tag"></i> Mã giảm giá khả dụng</h3>
+                <div id="availableDiscountCodes" class="discount-codes-list">
+                    <!-- Discount codes will be loaded here -->
                 </div>
             </div>
 

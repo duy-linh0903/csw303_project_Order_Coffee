@@ -251,6 +251,70 @@ body {
     text-align: center;
     color: #999;
 }
+
+/* Notification Item Styles */
+.notification-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+    background-color: #e3f2fd;
+}
+
+.notification-item.unread:hover {
+    background-color: #bbdefb;
+}
+
+.notification-content h4 {
+    font-size: 0.95rem;
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+}
+
+.notification-content p {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #555;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: #999;
+    font-style: italic;
+}
+
+.use-code-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0.5rem 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.use-code-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.use-code-btn i {
+    font-size: 0.9rem;
+}
+
 /* --- KẾT THÚC CSS THÔNG BÁO --- */
 
 /* Hero Section */
@@ -298,6 +362,173 @@ body {
     margin-bottom: 2rem;
     animation: fadeInUp 1s;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Promotion Banners Section */
+.promotion-section {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.promotion-slider {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.promotion-banner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 4rem;
+}
+
+.promotion-banner.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.promotion-banner:nth-child(2) {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.promotion-banner:nth-child(3) {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.promotion-banner:nth-child(4) {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 3rem;
+}
+
+.banner-text {
+    flex: 1;
+    color: white;
+}
+
+.banner-tag {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+.banner-text h3 {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.banner-text p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+    line-height: 1.6;
+}
+
+.banner-btn {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.banner-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.banner-image {
+    flex-shrink: 0;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+}
+
+.banner-image i {
+    font-size: 6rem;
+    color: white;
+    opacity: 0.9;
+}
+
+.slider-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.slider-btn {
+    background: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+.slider-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.slider-dots {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+    background: #667eea;
+    width: 35px;
+    border-radius: 6px;
 }
 
 /* Buttons */
@@ -1925,6 +2156,126 @@ body {
     font-weight: bold;
     color: var(--primary-color);
     margin-bottom: 1.5rem;
+}
+
+/* Discount Codes Section */
+.discount-codes-section {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+}
+
+.discount-codes-section h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.discount-codes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.discount-code-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.discount-code-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+.discount-code-item.applied {
+    border-color: #4caf50;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.discount-code-info {
+    flex: 1;
+}
+
+.discount-code-name {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.discount-code-description {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.discount-code-expiry {
+    font-size: 0.75rem;
+    color: #999;
+    font-style: italic;
+}
+
+.discount-code-expiry.expired {
+    color: #f44336;
+}
+
+.apply-code-btn {
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.apply-code-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.apply-code-btn.applied {
+    background: #4caf50;
+}
+
+.discount-code-item.expired {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.discount-code-item.expired .apply-code-btn {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.discount-code-item.expired:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.no-discount-codes {
+    text-align: center;
+    padding: 1rem;
+    color: #999;
+    font-style: italic;
 }
 
 /* Footer */
@@ -3579,6 +3930,51 @@ body {
 
 .btn-reorder-modal:hover i {
     transform: rotate(360deg) scale(1.1);
+}
+
+/* Responsive Design for Promotion Banners */
+@media (max-width: 768px) {
+    .promotion-section {
+        padding: 2rem 0;
+    }
+    
+    .promotion-slider {
+        height: auto;
+        min-height: 350px;
+    }
+    
+    .promotion-banner {
+        padding: 2rem 1.5rem;
+    }
+    
+    .banner-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .banner-text h3 {
+        font-size: 1.5rem;
+    }
+    
+    .banner-text p {
+        font-size: 1rem;
+    }
+    
+    .banner-image {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .banner-image i {
+        font-size: 4rem;
+    }
+    
+    .slider-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
 }
 
 /* Responsive Design for Orders Page */

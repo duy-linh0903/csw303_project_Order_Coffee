@@ -322,6 +322,9 @@ function renderCart() {
 
     if (emptyState) emptyState.style.display = 'none';
     if (summarySection) summarySection.style.display = 'block';
+    
+    // Load discount code suggestions
+    loadCartDiscountSuggestions();
 
     container.innerHTML = cart.map((item, index) => {
         const customizations = [];
@@ -625,7 +628,7 @@ function updateSummary() {
     const subtotal = calculateSubtotal();
     const tax = subtotal * 0.1;
     
-    let discount = appliedDiscount;
+    let discount = appliedDiscount > 0 ? subtotal * appliedDiscount : 0;
     const memberBenefits = getMemberTierBenefits();
     if (memberBenefits.discount > 0) {
         discount = subtotal * memberBenefits.discount;
@@ -715,10 +718,13 @@ function showCheckoutModal() {
     const subtotal = calculateSubtotal();
     const tax = subtotal * 0.1;
     
-    let discount = appliedDiscount;
+    // Calculate discount from promo codes (appliedDiscount stores percentage like 0.3 for 30%)
+    let discount = appliedDiscount > 0 ? subtotal * appliedDiscount : 0;
+    
+    // Add member tier discount
     const memberBenefits = getMemberTierBenefits();
     if (memberBenefits.discount > 0) {
-        discount = subtotal * memberBenefits.discount;
+        discount += subtotal * memberBenefits.discount;
     }
     
     const delivery = isDelivery ? deliveryFee : 0;
@@ -744,6 +750,7 @@ function showCheckoutModal() {
         }
     }
 
+    loadAvailableDiscountCodes();
     const checkoutModal = document.getElementById('checkoutModal');
     if (checkoutModal) checkoutModal.style.display = 'block';
 }
@@ -827,10 +834,13 @@ function placeOrder() {
     const subtotal = calculateSubtotal();
     const tax = subtotal * 0.1;
     
-    let discount = appliedDiscount;
+    // Calculate discount from promo codes (appliedDiscount stores percentage like 0.3 for 30%)
+    let discount = appliedDiscount > 0 ? subtotal * appliedDiscount : 0;
+    
+    // Add member tier discount
     const memberBenefits = getMemberTierBenefits();
     if (memberBenefits.discount > 0) {
-        discount = subtotal * memberBenefits.discount;
+        discount += subtotal * memberBenefits.discount;
     }
     
     const delivery = isDelivery ? deliveryFee : 0;
@@ -1170,3 +1180,155 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Load Available Discount Codes
+function loadAvailableDiscountCodes() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'null');
+    if (!currentUser) return;
+
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const userDiscounts = notifications.filter(n => 
+        n.userEmail === currentUser.email && 
+        n.type === 'promotion' && 
+        n.code
+    );
+    
+    const discountCodesContainer = document.getElementById('availableDiscountCodes');
+    if (!discountCodesContainer) return;
+
+    if (userDiscounts.length === 0) {
+        discountCodesContainer.innerHTML = '<div class="no-discount-codes">Hiện không có mã giảm giá khả dụng</div>';
+        return;
+    }
+
+    discountCodesContainer.innerHTML = userDiscounts.map(discount => {
+        const expiryDate = new Date(discount.expiryDate);
+        const isExpired = expiryDate < new Date();
+        const isApplied = appliedDiscount === discount.discount;
+        
+        return `
+            <div class="discount-code-item ${isExpired ? 'expired' : ''} ${isApplied ? 'applied' : ''}" 
+                 onclick="${isExpired ? '' : `applyDiscountCodeFromModal('${discount.code}', ${discount.discount})`}">
+                <div class="discount-code-info">
+                    <div class="discount-code-name">
+                        <i class="fas fa-tag"></i>
+                        ${discount.code}
+                        ${isApplied ? '<i class="fas fa-check-circle" style="color: #4caf50;"></i>' : ''}
+                    </div>
+                    <div class="discount-code-description">
+                        Giảm ${(discount.discount * 100)}% cho đơn hàng
+                    </div>
+                    <div class="discount-code-expiry ${isExpired ? 'expired' : ''}">
+                        ${isExpired ? 'Đã hết hạn' : 'Hết hạn: ' + expiryDate.toLocaleDateString('vi-VN')}
+                    </div>
+                </div>
+                <button class="apply-code-btn ${isApplied ? 'applied' : ''}" 
+                        onclick="event.stopPropagation(); ${isExpired ? '' : `applyDiscountCodeFromModal('${discount.code}', ${discount.discount})`}"
+                        ${isExpired ? 'disabled' : ''}>
+                    ${isApplied ? '<i class="fas fa-check"></i> Đã áp dụng' : '<i class="fas fa-tag"></i> Áp dụng'}
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Apply discount code from modal
+function applyDiscountCodeFromModal(code, discountPercent) {
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const notif = notifications.find(n => n.code === code);
+    
+    // Check if code is expired
+    if (notif && new Date(notif.expiryDate) < new Date()) {
+        showNotification('Mã giảm giá đã hết hạn!');
+        return;
+    }
+    
+    // Apply discount
+    appliedDiscount = discountPercent;
+    
+    // Reload discount codes to update UI
+    loadAvailableDiscountCodes();
+    
+    // Update checkout modal totals
+    showCheckoutModal();
+    
+    showNotification(`Đã áp dụng mã giảm giá ${code} - Giảm ${(discountPercent * 100)}%!`);
+}
+
+// Load discount code suggestions in cart
+function loadCartDiscountSuggestions() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'null');
+    if (!currentUser) return;
+
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const userDiscounts = notifications.filter(n => 
+        n.userEmail === currentUser.email && 
+        n.type === 'promotion' && 
+        n.code
+    );
+    
+    const container = document.getElementById('cartAvailableDiscounts');
+    if (!container) return;
+
+    if (userDiscounts.length === 0) {
+        container.innerHTML = '<div class="cart-no-discounts">Không có mã giảm giá khả dụng</div>';
+        return;
+    }
+
+    container.innerHTML = userDiscounts.map(discount => {
+        const expiryDate = new Date(discount.expiryDate);
+        const isExpired = expiryDate < new Date();
+        const isApplied = appliedDiscount === discount.discount;
+        
+        return `
+            <div class="cart-discount-item ${isExpired ? 'expired' : ''} ${isApplied ? 'applied' : ''}" 
+                 onclick="${isExpired ? '' : `applyCartDiscountCode('${discount.code}', ${discount.discount})`}">
+                <div class="cart-discount-left">
+                    <div class="cart-discount-code">
+                        <i class="fas fa-tag"></i>
+                        ${discount.code}
+                        ${isApplied ? '<i class="fas fa-check-circle" style="color: #4caf50;"></i>' : ''}
+                    </div>
+                    <div class="cart-discount-desc">
+                        Giảm ${(discount.discount * 100)}% cho đơn hàng
+                    </div>
+                    <div class="cart-discount-expiry ${isExpired ? 'expired' : ''}">
+                        ${isExpired ? 'Đã hết hạn' : 'HSD: ' + expiryDate.toLocaleDateString('vi-VN')}
+                    </div>
+                </div>
+                <button class="cart-discount-apply-btn ${isApplied ? 'applied' : ''}" 
+                        onclick="event.stopPropagation(); ${isExpired ? '' : `applyCartDiscountCode('${discount.code}', ${discount.discount})`}"
+                        ${isExpired ? 'disabled' : ''}>
+                    ${isApplied ? '<i class="fas fa-check"></i> Đã dùng' : '<i class="fas fa-tag"></i> Dùng'}
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Apply discount code from cart suggestions
+function applyCartDiscountCode(code, discountPercent) {
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const notif = notifications.find(n => n.code === code);
+    
+    // Check if code is expired
+    if (notif && new Date(notif.expiryDate) < new Date()) {
+        showNotification('Mã giảm giá đã hết hạn!');
+        return;
+    }
+    
+    // Auto-fill the promo code input
+    const promoInput = document.getElementById('promoCode');
+    if (promoInput) {
+        promoInput.value = code;
+    }
+    
+    // Apply discount
+    appliedDiscount = discountPercent;
+    updateSummary();
+    
+    // Reload suggestions to update UI
+    loadCartDiscountSuggestions();
+    
+    showNotification(`Đã áp dụng mã ${code} - Giảm ${(discountPercent * 100)}%!`);
+}

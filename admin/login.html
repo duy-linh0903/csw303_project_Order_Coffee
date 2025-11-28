@@ -844,6 +844,28 @@
                 users.push(newUser);
                 localStorage.setItem('users', JSON.stringify(users));
 
+                // Create welcome discount code (30% off for new members)
+                const discountCode = 'WELCOME' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30); // Valid for 30 days
+
+                // Add notification for new member discount
+                const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+                const welcomeNotification = {
+                    id: 'notif_' + Date.now(),
+                    userEmail: email,
+                    title: '🎉 Chào mừng thành viên mới!',
+                    message: `Chúc mừng bạn đã đăng ký thành công! Sử dụng mã giảm giá <strong>${discountCode}</strong> để nhận ưu đãi <strong>30% OFF</strong> cho đơn hàng đầu tiên. Mã có hiệu lực đến ${expiryDate.toLocaleDateString('vi-VN')}.`,
+                    type: 'promotion',
+                    code: discountCode,
+                    discount: 0.30,
+                    expiryDate: expiryDate.toISOString(),
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                };
+                notifications.unshift(welcomeNotification);
+                localStorage.setItem('notifications', JSON.stringify(notifications));
+
                 // Auto login
                 const userSession = {
                     email: newUser.email,
@@ -1022,6 +1044,15 @@
             const modal = document.getElementById('socialModal');
             if (modal && e.target === modal) {
                 closeAccountSelector();
+            }
+        });
+
+        // Check if URL has register=true parameter and auto-show signup form
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('register') === 'true') {
+                // Trigger click on signup link
+                document.getElementById('showSignupForm').click();
             }
         });
     </script>
