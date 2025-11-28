@@ -193,10 +193,13 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <!-- Delivery Option -->
+            <div class="delivery-option">
+                <label>
                     <input type="checkbox" id="deliveryCheckbox" onchange="toggleDeliveryOption()">
-                    <i class="fas fa-shipping-fast"></i> Giao hàng tận nơi (+23.000₫)
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>Giao hàng tận nơi</span>
+                    <span class="delivery-price">+23.000₫</span>
                 </label>
             </div>
 
@@ -210,28 +213,35 @@
     <div id="deliveryModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <span class="close" onclick="closeDeliveryModal()">&times;</span>
-            <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+            <h2>
                 <i class="fas fa-shipping-fast"></i> Thông tin giao hàng
             </h2>
-            <p style="color: #666; margin-bottom: 1rem;">
-                Phí giao hàng: <strong style="color: var(--accent-color);">23.000₫</strong>
-            </p>
+            
+            <div class="delivery-fee-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Phí giao hàng: <strong style="color: var(--accent-color);">23.000₫</strong></span>
+            </div>
+            
             <form id="deliveryForm" onsubmit="submitDeliveryInfo(event)">
                 <div class="form-group">
                     <label for="deliveryAddress">
-                        <i class="fas fa-map-marker-alt"></i> Địa chỉ giao hàng <span style="color: red;">*</span>
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span>Địa chỉ giao hàng</span>
+                        <span style="color: var(--accent-color); margin-left: 0.25rem;">*</span>
                     </label>
                     <textarea id="deliveryAddress" required
                         placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" rows="3"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="deliveryNote">
-                        <i class="fas fa-sticky-note"></i> Ghi chú giao hàng (tùy chọn)
+                        <i class="fas fa-sticky-note"></i> 
+                        <span>Ghi chú giao hàng</span>
+                        <span style="color: #999; font-weight: 400; margin-left: 0.25rem;">(tùy chọn)</span>
                     </label>
-                    <textarea id="deliveryNote" placeholder="Ghi chú cho người giao hàng..." rows="2"></textarea>
+                    <textarea id="deliveryNote" placeholder="Ví dụ: Gọi điện trước khi giao, để trước cửa..." rows="2"></textarea>
                 </div>
                 <button type="submit" class="btn-primary btn-full">
-                    <i class="fas fa-check"></i> Xác nhận giao hàng
+                    <i class="fas fa-check-circle"></i> Xác nhận giao hàng
                 </button>
             </form>
         </div>
