@@ -136,21 +136,140 @@ function showUserMenu(event) {
                     <a href="membercard.html" class="user-menu-item">
                         <i class="fas fa-id-card"></i> Thẻ Thành Viên
                     </a>
-                    <a href="#" class="user-menu-item" onclick="logout(); return false;">
-                        <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                    <a href="#" onclick="logout(event)" class="user-menu-item user-menu-logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Đăng xuất</span>
                     </a>
                 </div>
             </div>
         </div>
     `;
+    
     document.body.insertAdjacentHTML('beforeend', menu);
+    
+    // Animate dropdown
+    setTimeout(() => {
+        const dropdown = document.querySelector('.user-menu-dropdown');
+        if (dropdown) {
+            dropdown.style.opacity = '1';
+            dropdown.style.transform = 'translateY(0)';
+        }
+    }, 10);
 }
 
 // Logout
-function logout() {
+function logout(event) {
+    if (event) event.preventDefault();
+    showLogoutModal();
+}
+
+function showLogoutModal() {
+    const modal = document.createElement('div');
+    modal.id = 'logoutModalCart';
+    modal.style.cssText = `
+        display: block;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            position: relative;
+            background-color: white;
+            margin: 15% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease-out;
+        ">
+            <div style="
+                padding: 1.5rem;
+                background: linear-gradient(135deg, #ff6b6b, #ff8787);
+                color: white;
+                border-radius: 15px 15px 0 0;
+                text-align: center;
+            ">
+                <i class="fas fa-sign-out-alt" style="font-size: 3rem; margin-bottom: 0.5rem;"></i>
+                <h2 style="margin: 0; font-size: 1.5rem;">Xác nhận đăng xuất</h2>
+            </div>
+            <div style="
+                padding: 2rem;
+                text-align: center;
+                font-size: 1.1rem;
+                color: #2c1810;
+            ">
+                <p>Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?</p>
+            </div>
+            <div style="
+                padding: 1rem 1.5rem 1.5rem;
+                display: flex;
+                gap: 1rem;
+            ">
+                <button onclick="closeLogoutModal()" style="
+                    flex: 1;
+                    padding: 0.75rem 1.5rem;
+                    border: 2px solid #ddd;
+                    background: white;
+                    color: #666;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-weight: 600;
+                ">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+                <button onclick="confirmLogout()" style="
+                    flex: 1;
+                    padding: 0.75rem 1.5rem;
+                    border: none;
+                    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+                    color: white;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-weight: 600;
+                ">
+                    <i class="fas fa-check"></i> Đăng xuất
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeLogoutModal();
+        }
+    });
+}
+
+function closeLogoutModal() {
+    const modal = document.getElementById('logoutModalCart');
+    if (modal) modal.remove();
+}
+
+function confirmLogout() {
+    closeLogoutModal();
+    
+    // Clear user data immediately
     localStorage.removeItem('currentUser');
     sessionStorage.removeItem('currentUser');
-    window.location.href = '../admin/login.html';
+    currentUser = null;
+    
+    // Redirect immediately without delay
+    window.location.replace('../index.html');
 }
 
 // Load Cart from localStorage

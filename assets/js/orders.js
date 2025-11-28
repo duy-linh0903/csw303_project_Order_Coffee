@@ -201,13 +201,14 @@ function closeLogoutModal() {
 
 function confirmLogout() {
     closeLogoutModal();
-    showNotification('Đã đăng xuất thành công!');
     
-    setTimeout(() => {
-        localStorage.removeItem('currentUser');
-        sessionStorage.removeItem('currentUser');
-        window.location.href = '../index.html';
-    }, 1500);
+    // Clear user data immediately
+    localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('currentUser');
+    currentUser = null;
+    
+    // Redirect immediately without delay
+    window.location.replace('../index.html');
 }
 
 // Load Orders
