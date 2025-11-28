@@ -548,12 +548,16 @@ tbody tr:hover {
     padding: 2rem;
     border-radius: 15px;
     max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
     position: relative;
     animation: slideDown 0.3s;
 }
 
 .modal-large {
     max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .close {
@@ -1037,5 +1041,333 @@ tbody tr:hover {
     
     .detailed-stats {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Customer Detail Modal Styles */
+#customerDetailModal .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.customer-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+}
+
+.customer-avatar-large {
+    flex-shrink: 0;
+}
+
+.customer-avatar-large img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.customer-info-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+}
+
+.customer-email {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.customer-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.customer-tier-badge.diamond {
+    background: linear-gradient(135deg, #b9f2ff, #81e6ff);
+    color: #0066cc;
+}
+
+.customer-tier-badge.gold {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #996500;
+}
+
+.customer-tier-badge.silver {
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+    color: #666;
+}
+
+.tier-discount {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+}
+
+.customer-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.customer-stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.customer-stat-card .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.customer-stat-card .stat-content h3 {
+    font-size: 1.5rem;
+    color: var(--dark-color);
+    margin: 0 0 0.25rem 0;
+}
+
+.customer-stat-card .stat-content p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.customer-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.customer-detail-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.customer-detail-section h3 {
+    color: var(--dark-color);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.customer-detail-section h3 i {
+    color: var(--primary-color);
+}
+
+.favorite-items-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.favorite-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.favorite-item:hover {
+    transform: translateX(5px);
+    background: #e9ecef;
+}
+
+.favorite-rank {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.favorite-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.favorite-info strong {
+    color: var(--dark-color);
+}
+
+.favorite-info span {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.points-summary {
+    display: grid;
+    gap: 1rem;
+}
+
+.points-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.points-item span {
+    color: #666;
+}
+
+.points-item strong {
+    color: var(--dark-color);
+    font-size: 1.1rem;
+}
+
+.customer-orders-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.customer-order-item {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.customer-order-item .order-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.customer-order-item .order-info strong {
+    color: var(--dark-color);
+    font-size: 1.1rem;
+}
+
+.order-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.order-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.order-item-tag {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    background: white;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #666;
+    border: 1px solid #e0e0e0;
+}
+
+.customer-order-item .order-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.customer-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-action-large {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s;
+    box-shadow: var(--shadow);
+}
+
+.btn-action-large.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+}
+
+.btn-action-large.btn-secondary {
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+    color: white;
+}
+
+.btn-action-large:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Responsive for Customer Detail */
+@media (max-width: 768px) {
+    .customer-detail-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .customer-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .customer-detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .customer-actions {
+        flex-direction: column;
+    }
+    
+    .btn-action-large {
+        width: 100%;
+        justify-content: center;
     }
 }

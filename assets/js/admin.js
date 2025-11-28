@@ -592,7 +592,239 @@ function viewCustomer(email) {
     if (!customer) return;
 
     const customerOrders = orders.filter(o => o.customerEmail === email);
-    alert(`Customer: ${customer.name}\nEmail: ${email}\nTotal Orders: ${customerOrders.length}\nPoints: ${customer.points || 0}`);
+    const totalSpent = customerOrders.reduce((sum, o) => sum + o.total, 0);
+    const userOrdersList = JSON.parse(localStorage.getItem('userOrders') || '[]');
+    const customerUserOrders = userOrdersList.filter(o => o.userEmail === email);
+    
+    // Calculate member tier
+    let tier = 'Chưa có thẻ';
+    let tierClass = 'none';
+    let tierDiscount = 0;
+    let tierIcon = 'fa-user';
+    
+    if (totalSpent >= 10000000) {
+        tier = 'Thẻ Kim Cương';
+        tierClass = 'diamond';
+        tierDiscount = 15;
+        tierIcon = 'fa-gem';
+    } else if (totalSpent >= 3000000) {
+        tier = 'Thẻ Vàng';
+        tierClass = 'gold';
+        tierDiscount = 10;
+        tierIcon = 'fa-crown';
+    } else if (totalSpent >= 500000) {
+        tier = 'Thẻ Bạc';
+        tierClass = 'silver';
+        tierDiscount = 5;
+        tierIcon = 'fa-medal';
+    }
+
+    // Calculate average order value
+    const avgOrderValue = customerOrders.length > 0 ? totalSpent / customerOrders.length : 0;
+
+    // Get recent orders (last 5)
+    const recentOrders = customerOrders
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
+
+    // Calculate points earned
+    const totalPointsEarned = customerUserOrders.reduce((sum, o) => sum + (o.pointsEarned || 0), 0);
+
+    // Calculate most ordered items
+    const itemCounts = {};
+    customerOrders.forEach(order => {
+        order.items.forEach(item => {
+            itemCounts[item.name] = (itemCounts[item.name] || 0) + item.quantity;
+        });
+    });
+    
+    const favoriteItems = Object.entries(itemCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+    const customerDetailContent = document.getElementById('customerDetailContent');
+    customerDetailContent.innerHTML = `
+        <div style="display: grid; gap: 2rem;">
+            <!-- Customer Header -->
+            <div class="customer-detail-header">
+                <div class="customer-avatar-large">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(customer.name)}&size=120&background=6f4e37&color=fff" 
+                         alt="${customer.name}">
+                </div>
+                <div class="customer-info-header">
+                    <h2>${customer.name}</h2>
+                    <p class="customer-email"><i class="fas fa-envelope"></i> ${email}</p>
+                    <div class="customer-tier-badge ${tierClass}">
+                        <i class="fas ${tierIcon}"></i> ${tier}
+                        ${tierDiscount > 0 ? `<span class="tier-discount">Giảm ${tierDiscount}%</span>` : ''}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Grid -->
+            <div class="customer-stats-grid">
+                <div class="customer-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${customerOrders.length}</h3>
+                        <p>Tổng đơn hàng</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-dong-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${formatVND(totalSpent)}</h3>
+                        <p>Tổng chi tiêu</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${formatVND(avgOrderValue)}</h3>
+                        <p>Giá trị TB/đơn</p>
+                    </div>
+                </div>
+                <div class="customer-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${customer.points || 0}</h3>
+                        <p>Điểm hiện tại</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="customer-detail-grid">
+                <!-- Favorite Items -->
+                <div class="customer-detail-section">
+                    <h3><i class="fas fa-heart"></i> Món yêu thích</h3>
+                    ${favoriteItems.length > 0 ? `
+                        <div class="favorite-items-list">
+                            ${favoriteItems.map(([name, count], index) => `
+                                <div class="favorite-item">
+                                    <div class="favorite-rank">${index + 1}</div>
+                                    <div class="favorite-info">
+                                        <strong>${name}</strong>
+                                        <span>${count} lần đặt</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color: #999; text-align: center;">Chưa có dữ liệu</p>'}
+                </div>
+
+                <!-- Points History -->
+                <div class="customer-detail-section">
+                    <h3><i class="fas fa-coins"></i> Lịch sử điểm</h3>
+                    <div class="points-summary">
+                        <div class="points-item">
+                            <span>Tổng điểm đã kiếm:</span>
+                            <strong>${totalPointsEarned} điểm</strong>
+                        </div>
+                        <div class="points-item">
+                            <span>Điểm hiện tại:</span>
+                            <strong style="color: #4caf50;">${customer.points || 0} điểm</strong>
+                        </div>
+                        <div class="points-item">
+                            <span>Điểm đã dùng:</span>
+                            <strong>${totalPointsEarned - (customer.points || 0)} điểm</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="customer-detail-section">
+                <h3><i class="fas fa-history"></i> Đơn hàng gần đây</h3>
+                ${recentOrders.length > 0 ? `
+                    <div class="customer-orders-list">
+                        ${recentOrders.map(order => `
+                            <div class="customer-order-item">
+                                <div class="order-info">
+                                    <strong>#${order.id}</strong>
+                                    <span class="order-date">${new Date(order.date).toLocaleDateString('vi-VN')}</span>
+                                </div>
+                                <div class="order-items">
+                                    ${order.items.map(item => `<span class="order-item-tag">${item.name} x${item.quantity}</span>`).join('')}
+                                </div>
+                                <div class="order-status">
+                                    <span class="status-badge status-${order.status}">${order.status}</span>
+                                    <strong style="color: var(--primary-color);">${formatVND(order.total)}</strong>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<p style="color: #999; text-align: center;">Chưa có đơn hàng nào</p>'}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="customer-actions">
+                <button class="btn-action-large btn-primary" onclick="sendEmailToCustomer('${email}')">
+                    <i class="fas fa-envelope"></i> Gửi Email
+                </button>
+                <button class="btn-action-large btn-secondary" onclick="viewAllCustomerOrders('${email}')">
+                    <i class="fas fa-list"></i> Xem tất cả đơn hàng
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('customerDetailModal').style.display = 'block';
+}
+
+// Send Email to Customer (placeholder)
+function sendEmailToCustomer(email) {
+    showNotification(`Đang soạn email cho ${email}...`);
+    // In real app, this would open email client or send via API
+}
+
+// View All Customer Orders
+function viewAllCustomerOrders(email) {
+    document.getElementById('customerDetailModal').style.display = 'none';
+    showSection('orders');
+    
+    // Filter orders for this customer
+    setTimeout(() => {
+        const ordersTableBody = document.getElementById('ordersTableBody');
+        const customerOrders = orders.filter(o => o.customerEmail === email);
+        
+        if (customerOrders.length === 0) {
+            ordersTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">Không tìm thấy đơn hàng</td></tr>';
+            return;
+        }
+
+        ordersTableBody.innerHTML = customerOrders.map(order => `
+            <tr style="background: #fffbea;">
+                <td><strong>#${order.id}</strong></td>
+                <td>${order.customerName}</td>
+                <td>${order.items.length} items</td>
+                <td><strong>${formatVND(order.total)}</strong></td>
+                <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+                <td>${new Date(order.date).toLocaleDateString()}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-action btn-view" onclick="viewOrder('${order.id}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-action btn-edit" onclick="updateOrderStatus('${order.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-action btn-delete" onclick="deleteOrder('${order.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }, 100);
 }
 
 // Delete Customer
