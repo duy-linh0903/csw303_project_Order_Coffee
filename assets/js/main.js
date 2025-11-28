@@ -595,10 +595,14 @@ function handleNotificationClick(notifId) {
 // Apply discount code from notification
 function applyDiscountCode(code, discountPercent) {
     const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-    const notif = notifications.find(n => n.code === code);
+    const notifIndex = notifications.findIndex(n => n.code === code);
+    
+    if (notifIndex === -1) return;
+    
+    const notif = notifications[notifIndex];
     
     // Check if code is expired
-    if (notif && new Date(notif.expiryDate) < new Date()) {
+    if (new Date(notif.expiryDate) < new Date()) {
         showNotification('Mã giảm giá đã hết hạn!');
         return;
     }
@@ -606,6 +610,14 @@ function applyDiscountCode(code, discountPercent) {
     // Apply discount (store as percentage for calculation later)
     memberCardDiscount = discountPercent;
     updateOrderSummary();
+    
+    // Mark as read and remove the notification
+    notifications[notifIndex].isRead = true;
+    notifications.splice(notifIndex, 1);
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+    
+    // Reload notifications to update UI
+    loadNotifications();
     
     // Close notification dropdown
     const notifyDropdown = document.getElementById('notificationDropdown');
@@ -683,10 +695,14 @@ function loadAvailableDiscountCodes() {
 // Apply discount code from modal
 function applyDiscountCodeFromModal(code, discountPercent) {
     const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-    const notif = notifications.find(n => n.code === code);
+    const notifIndex = notifications.findIndex(n => n.code === code);
+    
+    if (notifIndex === -1) return;
+    
+    const notif = notifications[notifIndex];
     
     // Check if code is expired
-    if (notif && new Date(notif.expiryDate) < new Date()) {
+    if (new Date(notif.expiryDate) < new Date()) {
         showNotification('Mã giảm giá đã hết hạn!');
         return;
     }
@@ -699,7 +715,13 @@ function applyDiscountCodeFromModal(code, discountPercent) {
     const newTotal = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(newTotal);
     
-    // Reload discount codes to update UI
+    // Mark as read and remove the notification
+    notifications[notifIndex].isRead = true;
+    notifications.splice(notifIndex, 1);
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+    
+    // Reload notifications and discount codes to update UI
+    loadNotifications();
     loadAvailableDiscountCodes();
     
     showNotification(`Đã áp dụng mã giảm giá ${code} - Giảm ${(discountPercent * 100)}%!`);

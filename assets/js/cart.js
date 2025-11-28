@@ -1309,10 +1309,14 @@ function loadCartDiscountSuggestions() {
 // Apply discount code from cart suggestions
 function applyCartDiscountCode(code, discountPercent) {
     const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-    const notif = notifications.find(n => n.code === code);
+    const notifIndex = notifications.findIndex(n => n.code === code);
+    
+    if (notifIndex === -1) return;
+    
+    const notif = notifications[notifIndex];
     
     // Check if code is expired
-    if (notif && new Date(notif.expiryDate) < new Date()) {
+    if (new Date(notif.expiryDate) < new Date()) {
         showNotification('Mã giảm giá đã hết hạn!');
         return;
     }
@@ -1326,6 +1330,11 @@ function applyCartDiscountCode(code, discountPercent) {
     // Apply discount
     appliedDiscount = discountPercent;
     updateSummary();
+    
+    // Mark as read and remove the notification
+    notifications[notifIndex].isRead = true;
+    notifications.splice(notifIndex, 1);
+    localStorage.setItem('notifications', JSON.stringify(notifications));
     
     // Reload suggestions to update UI
     loadCartDiscountSuggestions();
