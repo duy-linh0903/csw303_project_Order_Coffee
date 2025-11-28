@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Load Data from localStorage
 function loadData() {
-    // Load orders
-    const savedOrders = localStorage.getItem('adminOrders');
+    // Load orders from 'orders' key (where cart.js saves them)
+    const savedOrders = localStorage.getItem('orders');
     if (savedOrders) {
         orders = JSON.parse(savedOrders);
     }
@@ -396,7 +396,7 @@ function deleteOrder(orderId) {
 
 // Save Orders
 function saveOrders() {
-    localStorage.setItem('adminOrders', JSON.stringify(orders));
+    localStorage.setItem('orders', JSON.stringify(orders));
 }
 
 // Load Customers
