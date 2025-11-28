@@ -6,6 +6,7 @@
     <title>Admin Dashboard - Coffee Cabin</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -197,17 +198,154 @@
 
         <!-- Analytics Section -->
         <section id="analytics" class="content-section">
-            <h1>Analytics</h1>
-            <div class="analytics-grid">
-                <div class="analytics-card">
-                    <h3>Sales Overview</h3>
-                    <canvas id="salesChart"></canvas>
+            <h1>Analytics & Reports</h1>
+            
+            <!-- Time Period Selector -->
+            <div class="analytics-header">
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="7" onclick="changeAnalyticsPeriod(7)">7 Ngày</button>
+                    <button class="period-btn" data-period="30" onclick="changeAnalyticsPeriod(30)">30 Ngày</button>
+                    <button class="period-btn" data-period="90" onclick="changeAnalyticsPeriod(90)">3 Tháng</button>
+                    <button class="period-btn" data-period="365" onclick="changeAnalyticsPeriod(365)">1 Năm</button>
                 </div>
-                <div class="analytics-card">
-                    <h3>Popular Categories</h3>
-                    <div id="categoryStats" class="category-stats">
-                        <!-- Category stats will be displayed here -->
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="analytics-metrics">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-chart-line"></i>
                     </div>
+                    <div class="metric-content">
+                        <h4>Doanh thu trung bình</h4>
+                        <h2 id="avgRevenue">0₫</h2>
+                        <span class="metric-change positive" id="revenueChange">
+                            <i class="fas fa-arrow-up"></i> +0%
+                        </span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h4>Đơn hàng trung bình</h4>
+                        <h2 id="avgOrders">0</h2>
+                        <span class="metric-change positive" id="ordersChange">
+                            <i class="fas fa-arrow-up"></i> +0%
+                        </span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h4>Giá trị đơn TB</h4>
+                        <h2 id="avgOrderValue">0₫</h2>
+                        <span class="metric-change positive" id="orderValueChange">
+                            <i class="fas fa-arrow-up"></i> +0%
+                        </span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h4>Khách hàng mới</h4>
+                        <h2 id="newCustomers">0</h2>
+                        <span class="metric-change positive" id="customersChange">
+                            <i class="fas fa-arrow-up"></i> +0%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="charts-row">
+                <div class="chart-card chart-large">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-area"></i> Doanh thu theo thời gian</h3>
+                        <select id="revenueChartType" onchange="updateRevenueChart()">
+                            <option value="daily">Theo ngày</option>
+                            <option value="weekly">Theo tuần</option>
+                            <option value="monthly">Theo tháng</option>
+                        </select>
+                    </div>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-pizza-slice"></i> Danh mục bán chạy</h3>
+                    </div>
+                    <canvas id="categoryChart"></canvas>
+                    <div id="categoryLegend" class="chart-legend"></div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-tasks"></i> Trạng thái đơn hàng</h3>
+                    </div>
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-crown"></i> Khách hàng theo hạng</h3>
+                    </div>
+                    <canvas id="customerTierChart"></canvas>
+                    <div id="tierStats" class="tier-stats"></div>
+                </div>
+            </div>
+
+            <!-- Top Products & Customers -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-star"></i> Top 10 sản phẩm bán chạy</h3>
+                    </div>
+                    <div id="topProductsList" class="top-list">
+                        <!-- Top products will be listed here -->
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-user-crown"></i> Top 10 khách hàng VIP</h3>
+                    </div>
+                    <div id="topCustomersList" class="top-list">
+                        <!-- Top customers will be listed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Stats -->
+            <div class="detailed-stats">
+                <div class="stat-section">
+                    <h3><i class="fas fa-clock"></i> Giờ cao điểm</h3>
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+                <div class="stat-section">
+                    <h3><i class="fas fa-calendar-week"></i> Ngày trong tuần</h3>
+                    <canvas id="weekdayChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Export Reports -->
+            <div class="export-section">
+                <h3><i class="fas fa-download"></i> Xuất báo cáo</h3>
+                <div class="export-buttons">
+                    <button class="btn-export" onclick="exportReport('pdf')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                    <button class="btn-export" onclick="exportReport('excel')">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                    <button class="btn-export" onclick="exportReport('csv')">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
                 </div>
             </div>
         </section>

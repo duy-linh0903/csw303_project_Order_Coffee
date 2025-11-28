@@ -784,3 +784,650 @@ function generateSampleOrders() {
     updateDashboard();
     showNotification('Sample orders generated');
 }
+
+// ==================== ANALYTICS FUNCTIONS ====================
+
+let analyticsCharts = {};
+let analyticsPeriod = 7; // Default 7 days
+
+// Change Analytics Period
+function changeAnalyticsPeriod(days) {
+    analyticsPeriod = days;
+    
+    // Update button states
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.dataset.period) === days) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Reload analytics
+    loadAnalytics();
+}
+
+// Load Analytics Data
+function loadAnalytics() {
+    if (!orders || orders.length === 0) {
+        showEmptyAnalytics();
+        return;
+    }
+    
+    // Calculate date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - analyticsPeriod);
+    
+    // Filter orders by period
+    const periodOrders = orders.filter(order => {
+        const orderDate = new Date(order.date);
+        return orderDate >= startDate && orderDate <= endDate;
+    });
+    
+    // Update metrics
+    updateAnalyticsMetrics(periodOrders);
+    
+    // Update charts
+    updateRevenueChart(periodOrders);
+    updateCategoryChart(periodOrders);
+    updateOrderStatusChart(periodOrders);
+    updateCustomerTierChart();
+    updateTopProducts(periodOrders);
+    updateTopCustomers();
+    updateHourlyChart(periodOrders);
+    updateWeekdayChart(periodOrders);
+}
+
+// Show Empty Analytics
+function showEmptyAnalytics() {
+    const sections = ['revenueChart', 'categoryChart', 'orderStatusChart', 'customerTierChart'];
+    sections.forEach(id => {
+        const canvas = document.getElementById(id);
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#999';
+            ctx.textAlign = 'center';
+            ctx.fillText('Chưa có dữ liệu', canvas.width / 2, canvas.height / 2);
+        }
+    });
+}
+
+// Update Analytics Metrics
+function updateAnalyticsMetrics(periodOrders) {
+    const totalRevenue = periodOrders.reduce((sum, order) => sum + order.total, 0);
+    const avgRevenue = periodOrders.length > 0 ? totalRevenue / analyticsPeriod : 0;
+    const avgOrders = periodOrders.length / analyticsPeriod;
+    const avgOrderValue = periodOrders.length > 0 ? totalRevenue / periodOrders.length : 0;
+    
+    // Count new customers in period
+    const customerEmails = new Set(periodOrders.map(o => o.customerEmail));
+    const newCustomers = customerEmails.size;
+    
+    // Update UI
+    document.getElementById('avgRevenue').textContent = formatVND(Math.round(avgRevenue));
+    document.getElementById('avgOrders').textContent = avgOrders.toFixed(1);
+    document.getElementById('avgOrderValue').textContent = formatVND(Math.round(avgOrderValue));
+    document.getElementById('newCustomers').textContent = newCustomers;
+    
+    // Calculate changes (mock data for now - would need historical data)
+    updateMetricChange('revenueChange', 12.5);
+    updateMetricChange('ordersChange', 8.3);
+    updateMetricChange('orderValueChange', 5.7);
+    updateMetricChange('customersChange', 15.2);
+}
+
+// Update Metric Change
+function updateMetricChange(elementId, percentage) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const isPositive = percentage >= 0;
+    element.className = `metric-change ${isPositive ? 'positive' : 'negative'}`;
+    element.innerHTML = `
+        <i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i> 
+        ${isPositive ? '+' : ''}${percentage.toFixed(1)}%
+    `;
+}
+
+// Update Revenue Chart
+function updateRevenueChart(periodOrders = null) {
+    if (!periodOrders) {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - analyticsPeriod);
+        periodOrders = orders.filter(order => {
+            const orderDate = new Date(order.date);
+            return orderDate >= startDate && orderDate <= endDate;
+        });
+    }
+    
+    const chartType = document.getElementById('revenueChartType')?.value || 'daily';
+    const ctx = document.getElementById('revenueChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (analyticsCharts.revenue) {
+        analyticsCharts.revenue.destroy();
+    }
+    
+    // Prepare data based on chart type
+    let labels = [];
+    let data = [];
+    
+    if (chartType === 'daily') {
+        // Group by day
+        const dailyData = {};
+        for (let i = analyticsPeriod - 1; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            dailyData[dateStr] = 0;
+        }
+        
+        periodOrders.forEach(order => {
+            const dateStr = new Date(order.date).toISOString().split('T')[0];
+            if (dailyData.hasOwnProperty(dateStr)) {
+                dailyData[dateStr] += order.total;
+            }
+        });
+        
+        labels = Object.keys(dailyData).map(date => {
+            const d = new Date(date);
+            return `${d.getDate()}/${d.getMonth() + 1}`;
+        });
+        data = Object.values(dailyData);
+    }
+    
+    // Create chart
+    analyticsCharts.revenue = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: data,
+                borderColor: '#6f4e37',
+                backgroundColor: 'rgba(111, 78, 55, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2.5,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Doanh thu: ' + formatVND(context.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatVND(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update Category Chart
+function updateCategoryChart(periodOrders) {
+    const ctx = document.getElementById('categoryChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (analyticsCharts.category) {
+        analyticsCharts.category.destroy();
+    }
+    
+    // Calculate category sales
+    const categoryData = { hot: 0, iced: 0, special: 0 };
+    
+    periodOrders.forEach(order => {
+        order.items.forEach(item => {
+            const menuItem = menuItems.find(m => m.name === item.name);
+            if (menuItem) {
+                categoryData[menuItem.category] += (item.totalPrice || item.price) * item.quantity;
+            }
+        });
+    });
+    
+    const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d'];
+    const labels = ['Hot Coffee', 'Iced Coffee', 'Special'];
+    const data = [categoryData.hot, categoryData.iced, categoryData.special];
+    
+    // Create chart
+    analyticsCharts.category = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${formatVND(context.parsed)} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Update legend
+    const legendContainer = document.getElementById('categoryLegend');
+    if (legendContainer) {
+        legendContainer.innerHTML = labels.map((label, index) => `
+            <div class="legend-item">
+                <div class="legend-color" style="background: ${colors[index]}"></div>
+                <span>${label}</span>
+            </div>
+        `).join('');
+    }
+}
+
+// Update Order Status Chart
+function updateOrderStatusChart(periodOrders) {
+    const ctx = document.getElementById('orderStatusChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (analyticsCharts.orderStatus) {
+        analyticsCharts.orderStatus.destroy();
+    }
+    
+    // Count orders by status
+    const statusData = {
+        pending: 0,
+        preparing: 0,
+        completed: 0,
+        cancelled: 0
+    };
+    
+    periodOrders.forEach(order => {
+        if (statusData.hasOwnProperty(order.status)) {
+            statusData[order.status]++;
+        }
+    });
+    
+    const colors = ['#ff9800', '#2196f3', '#4caf50', '#f44336'];
+    const labels = ['Pending', 'Preparing', 'Completed', 'Cancelled'];
+    const data = Object.values(statusData);
+    
+    // Create chart
+    analyticsCharts.orderStatus = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Update Customer Tier Chart
+function updateCustomerTierChart() {
+    const ctx = document.getElementById('customerTierChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (analyticsCharts.customerTier) {
+        analyticsCharts.customerTier.destroy();
+    }
+    
+    // Calculate tier distribution
+    const tierData = { diamond: 0, gold: 0, silver: 0, none: 0 };
+    
+    customers.forEach(customer => {
+        const customerOrders = orders.filter(o => o.customerEmail === customer.email);
+        const totalSpent = customerOrders.reduce((sum, o) => sum + o.total, 0);
+        
+        if (totalSpent >= 10000000) tierData.diamond++;
+        else if (totalSpent >= 3000000) tierData.gold++;
+        else if (totalSpent >= 500000) tierData.silver++;
+        else tierData.none++;
+    });
+    
+    const colors = ['#b9f2ff', '#ffd700', '#c0c0c0', '#e0e0e0'];
+    const labels = ['Diamond', 'Gold', 'Silver', 'No Tier'];
+    const data = Object.values(tierData);
+    
+    // Create chart
+    analyticsCharts.customerTier = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Số khách hàng',
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Update tier stats
+    const tierStats = document.getElementById('tierStats');
+    if (tierStats) {
+        const tiers = [
+            { name: 'Diamond', count: tierData.diamond, class: 'diamond' },
+            { name: 'Gold', count: tierData.gold, class: 'gold' },
+            { name: 'Silver', count: tierData.silver, class: 'silver' },
+            { name: 'No Tier', count: tierData.none, class: 'none' }
+        ];
+        
+        tierStats.innerHTML = tiers.map(tier => `
+            <div class="tier-stat-item ${tier.class}">
+                <span><strong>${tier.name}</strong></span>
+                <span>${tier.count} khách hàng</span>
+            </div>
+        `).join('');
+    }
+}
+
+// Update Top Products
+function updateTopProducts(periodOrders) {
+    const container = document.getElementById('topProductsList');
+    if (!container) return;
+    
+    // Calculate product sales
+    const productSales = {};
+    
+    periodOrders.forEach(order => {
+        order.items.forEach(item => {
+            if (!productSales[item.name]) {
+                productSales[item.name] = { quantity: 0, revenue: 0 };
+            }
+            productSales[item.name].quantity += item.quantity;
+            productSales[item.name].revenue += (item.totalPrice || item.price) * item.quantity;
+        });
+    });
+    
+    // Sort by revenue
+    const sortedProducts = Object.entries(productSales)
+        .sort((a, b) => b[1].revenue - a[1].revenue)
+        .slice(0, 10);
+    
+    if (sortedProducts.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">Chưa có dữ liệu</p>';
+        return;
+    }
+    
+    container.innerHTML = sortedProducts.map(([name, data], index) => {
+        let rankClass = '';
+        if (index === 0) rankClass = 'gold';
+        else if (index === 1) rankClass = 'silver';
+        else if (index === 2) rankClass = 'bronze';
+        
+        return `
+            <div class="top-list-item">
+                <div class="top-list-rank ${rankClass}">${index + 1}</div>
+                <div class="top-list-info">
+                    <h4>${name}</h4>
+                    <p>${data.quantity} đã bán</p>
+                </div>
+                <div class="top-list-value">
+                    <strong>${formatVND(data.revenue)}</strong>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Update Top Customers
+function updateTopCustomers() {
+    const container = document.getElementById('topCustomersList');
+    if (!container) return;
+    
+    // Calculate customer spending
+    const customerSpending = customers.map(customer => {
+        const customerOrders = orders.filter(o => o.customerEmail === customer.email);
+        const totalSpent = customerOrders.reduce((sum, o) => sum + o.total, 0);
+        return {
+            name: customer.name,
+            email: customer.email,
+            totalSpent: totalSpent,
+            orderCount: customerOrders.length
+        };
+    });
+    
+    // Sort by spending
+    const sortedCustomers = customerSpending
+        .sort((a, b) => b.totalSpent - a.totalSpent)
+        .slice(0, 10);
+    
+    if (sortedCustomers.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">Chưa có dữ liệu</p>';
+        return;
+    }
+    
+    container.innerHTML = sortedCustomers.map((customer, index) => {
+        let rankClass = '';
+        if (index === 0) rankClass = 'gold';
+        else if (index === 1) rankClass = 'silver';
+        else if (index === 2) rankClass = 'bronze';
+        
+        return `
+            <div class="top-list-item">
+                <div class="top-list-rank ${rankClass}">${index + 1}</div>
+                <div class="top-list-info">
+                    <h4>${customer.name}</h4>
+                    <p>${customer.orderCount} đơn hàng</p>
+                </div>
+                <div class="top-list-value">
+                    <strong>${formatVND(customer.totalSpent)}</strong>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Update Hourly Chart
+function updateHourlyChart(periodOrders) {
+    const ctx = document.getElementById('hourlyChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (analyticsCharts.hourly) {
+        analyticsCharts.hourly.destroy();
+    }
+    
+    // Count orders by hour
+    const hourlyData = new Array(24).fill(0);
+    
+    periodOrders.forEach(order => {
+        const hour = new Date(order.date).getHours();
+        hourlyData[hour]++;
+    });
+    
+    const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+    
+    // Create chart
+    analyticsCharts.hourly = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Số đơn hàng',
+                data: hourlyData,
+                backgroundColor: 'rgba(111, 78, 55, 0.6)',
+                borderColor: '#6f4e37',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update Weekday Chart
+function updateWeekdayChart(periodOrders) {
+    const ctx = document.getElementById('weekdayChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (analyticsCharts.weekday) {
+        analyticsCharts.weekday.destroy();
+    }
+    
+    // Count orders by weekday
+    const weekdayData = new Array(7).fill(0);
+    
+    periodOrders.forEach(order => {
+        const day = new Date(order.date).getDay();
+        weekdayData[day]++;
+    });
+    
+    const labels = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    
+    // Create chart
+    analyticsCharts.weekday = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Số đơn hàng',
+                data: weekdayData,
+                backgroundColor: [
+                    'rgba(255, 107, 107, 0.6)',
+                    'rgba(78, 205, 196, 0.6)',
+                    'rgba(255, 230, 109, 0.6)',
+                    'rgba(132, 94, 247, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 99, 132, 0.6)'
+                ],
+                borderColor: [
+                    '#ff6b6b',
+                    '#4ecdc4',
+                    '#ffe66d',
+                    '#845ef7',
+                    '#ff9f40',
+                    '#36a2eb',
+                    '#ff6384'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Export Report
+function exportReport(format) {
+    showNotification(`Đang xuất báo cáo ${format.toUpperCase()}...`);
+    
+    // In a real app, this would generate and download the report
+    setTimeout(() => {
+        showNotification(`Báo cáo ${format.toUpperCase()} đã được tải xuống!`);
+    }, 2000);
+}
+
+// Load analytics when section is shown
+const originalShowSection = showSection;
+showSection = function(sectionId) {
+    originalShowSection.call(this, sectionId);
+    
+    if (sectionId === 'analytics') {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            loadAnalytics();
+        }, 100);
+    }
+};
