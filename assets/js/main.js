@@ -1087,10 +1087,10 @@ function handlePayment() {
         };
     }
 
-    // Save order to admin orders
-    const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-    adminOrders.push(order);
-    localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+    // Save order to orders list (for admin dashboard)
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
 
     // Save order to user orders (for profile page)
     const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
