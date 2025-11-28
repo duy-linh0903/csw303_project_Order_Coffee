@@ -371,12 +371,6 @@ http://127.0.0.1:5500
 - [ ] Dark mode
 - [ ] Mobile app version
 
-## 👨‍💻 Developer
-
-**Duy Linh**
-- GitHub: [@duy-linh0903](https://github.com/duy-linh0903)
-- Repository: [csw303_project_Order_Coffee](https://github.com/duy-linh0903/csw303_project_Order_Coffee)
-
 ## 📄 License
 
 This project is part of CSW303 course assignment.
