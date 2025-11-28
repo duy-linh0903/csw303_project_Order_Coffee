@@ -129,7 +129,7 @@ describe('Cart Operations', () => {
         const item = {
             id: 1,
             name: 'Espresso',
-            price: 85000,
+            price: 87500,
             quantity: 1,
             size: 'Medium'
         };
@@ -142,7 +142,7 @@ describe('Cart Operations', () => {
         const item = {
             id: 1,
             name: 'Espresso',
-            price: 85000,
+            price: 87500,
             quantity: 1,
             size: 'Medium'
         };
@@ -152,8 +152,8 @@ describe('Cart Operations', () => {
     });
 
     test('should remove item from cart', () => {
-        const item1 = { id: 1, name: 'Espresso', price: 85000, quantity: 1 };
-        const item2 = { id: 2, name: 'Latte', price: 95000, quantity: 1 };
+        const item1 = { id: 1, name: 'Espresso', price: 87500, quantity: 1 };
+        const item2 = { id: 2, name: 'Latte', price: 118750, quantity: 1 };
         cart.push(item1, item2);
         cart = cart.filter(item => item.id !== 1);
         expect(cart.length).toBe(1);
@@ -162,17 +162,17 @@ describe('Cart Operations', () => {
 
     test('should calculate cart subtotal correctly', () => {
         const items = [
-            { id: 1, name: 'Espresso', price: 85000, quantity: 2 },
-            { id: 2, name: 'Latte', price: 95000, quantity: 1 }
+            { id: 1, name: 'Espresso', price: 87500, quantity: 2 },
+            { id: 2, name: 'Latte', price: 118750, quantity: 1 }
         ];
         const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        expect(subtotal).toBe(265000); // (85000*2) + (95000*1)
+        expect(subtotal).toBe(293750); // (87500*2) + (118750*1)
     });
 
     test('should clear cart', () => {
         cart = [
-            { id: 1, name: 'Espresso', price: 85000, quantity: 1 },
-            { id: 2, name: 'Latte', price: 95000, quantity: 1 }
+            { id: 1, name: 'Espresso', price: 87500, quantity: 1 },
+            { id: 2, name: 'Latte', price: 118750, quantity: 1 }
         ];
         cart = [];
         expect(cart.length).toBe(0);
@@ -182,33 +182,34 @@ describe('Cart Operations', () => {
 // Test Suite 5: Price Calculation with Customizations
 describe('Price Calculation with Customizations', () => {
     
-    test('should add 10,000 for Medium size', () => {
-        const basePrice = 85000;
-        const sizeExtra = 10000;
+    test('should add 12,500 for Medium size', () => {
+        const basePrice = 45000;
+        const sizeExtra = 12500;
         const total = basePrice + sizeExtra;
-        expect(total).toBe(95000);
+        expect(total).toBe(57500);
     });
 
     test('should add 25,000 for Large size', () => {
-        const basePrice = 85000;
+        const basePrice = 45000;
         const sizeExtra = 25000;
         const total = basePrice + sizeExtra;
-        expect(total).toBe(110000);
+        expect(total).toBe(70000);
     });
 
-    test('should add 15,000 for espresso shot', () => {
-        const basePrice = 85000;
-        const shotExtra = 15000;
+    test('should add 18,750 for espresso shot', () => {
+        const basePrice = 45000;
+        const shotExtra = 18750;
         const total = basePrice + shotExtra;
-        expect(total).toBe(100000);
+        expect(total).toBe(63750);
     });
 
     test('should calculate total with all customizations', () => {
-        const basePrice = 85000;
+        const basePrice = 45000;
         const sizeExtra = 25000; // Large
-        const shotExtra = 15000; // Extra shot
-        const total = basePrice + sizeExtra + shotExtra;
-        expect(total).toBe(125000);
+        const shotExtra = 18750; // Extra shot
+        const milkExtra = 12500; // Special milk
+        const total = basePrice + sizeExtra + shotExtra + milkExtra;
+        expect(total).toBe(101250);
     });
 });
 
@@ -221,74 +222,73 @@ describe('Tax and Delivery Calculation', () => {
         expect(tax).toBe(10000);
     });
 
-    test('should apply 25,000 delivery fee', () => {
-        const deliveryFee = 25000;
-        expect(deliveryFee).toBe(25000);
+    test('should apply 23,000 delivery fee', () => {
+        const deliveryFee = 23000;
+        expect(deliveryFee).toBe(23000);
     });
 
-    test('should waive delivery fee for Gold tier', () => {
+    test('should charge delivery fee for all tiers', () => {
         const tier = 'gold';
-        const deliveryFee = tier === 'gold' || tier === 'diamond' ? 0 : 25000;
-        expect(deliveryFee).toBe(0);
+        const deliveryFee = 23000;
+        expect(deliveryFee).toBe(23000);
     });
 
-    test('should waive delivery fee for Diamond tier', () => {
+    test('should charge delivery fee for Diamond tier', () => {
         const tier = 'diamond';
-        const deliveryFee = tier === 'gold' || tier === 'diamond' ? 0 : 25000;
-        expect(deliveryFee).toBe(0);
+        const deliveryFee = 23000;
+        expect(deliveryFee).toBe(23000);
     });
 
     test('should calculate final total correctly', () => {
         const subtotal = 100000;
         const tax = subtotal * 0.10;
-        const deliveryFee = 25000;
+        const deliveryFee = 23000;
         const discount = subtotal * 0.05; // 5% Silver discount
         const total = subtotal + tax + deliveryFee - discount;
-        expect(total).toBe(130000); // 100000 + 10000 + 25000 - 5000
+        expect(total).toBe(128000); // 100000 + 10000 + 23000 - 5000
     });
 });
 
-// Test Suite 7: Reward System
+// Test Suite 7: Points Redemption System
 describe('Reward System', () => {
     
-    const rewards = [
-        { id: 1, name: '10% Off', points: 100, discount: 0.10, type: 'percentage' },
-        { id: 2, name: '15% Off', points: 150, discount: 0.15, type: 'percentage' },
-        { id: 3, name: 'Free Coffee', points: 75, discount: 125000, type: 'fixed' },
-        { id: 4, name: '50,000₫ Off', points: 50, discount: 50000, type: 'fixed' }
+    const pointsRedemption = [
+        { points: 50, discount: 10000 },
+        { points: 100, discount: 25000 },
+        { points: 200, discount: 50000 },
+        { points: 500, discount: 150000 }
     ];
 
     test('should allow redemption with sufficient points', () => {
         const userPoints = 100;
-        const reward = rewards[0]; // 10% Off - 100 points
-        const canRedeem = userPoints >= reward.points;
+        const option = pointsRedemption[1]; // 25,000₫ Off - 100 points
+        const canRedeem = userPoints >= option.points;
         expect(canRedeem).toBe(true);
     });
 
     test('should not allow redemption with insufficient points', () => {
         const userPoints = 50;
-        const reward = rewards[1]; // 15% Off - 150 points
-        const canRedeem = userPoints >= reward.points;
+        const option = pointsRedemption[2]; // 50,000₫ Off - 200 points
+        const canRedeem = userPoints >= option.points;
         expect(canRedeem).toBe(false);
     });
 
-    test('should apply percentage discount correctly', () => {
-        const subtotal = 200000;
-        const reward = rewards[0]; // 10% Off
-        const discount = subtotal * reward.discount;
-        expect(discount).toBe(20000);
+    test('should apply fixed discount correctly for 50 points', () => {
+        const option = pointsRedemption[0]; // 10,000₫ Off - 50 points
+        const discount = option.discount;
+        expect(discount).toBe(10000);
     });
 
-    test('should apply fixed discount correctly', () => {
-        const reward = rewards[3]; // 50,000₫ Off
-        const discount = reward.discount;
+    test('should apply fixed discount correctly for 200 points', () => {
+        const option = pointsRedemption[2]; // 50,000₫ Off - 200 points
+        const discount = option.discount;
         expect(discount).toBe(50000);
     });
 
     test('should deduct points after redemption', () => {
         let userPoints = 100;
-        const reward = rewards[0]; // 10% Off - 100 points
-        userPoints -= reward.points;
+        const option = pointsRedemption[1]; // 25,000₫ Off - 100 points
+        userPoints -= option.points;
         expect(userPoints).toBe(0);
     });
 });
@@ -297,7 +297,7 @@ describe('Reward System', () => {
 describe('Order Validation', () => {
     
     test('should validate non-empty cart', () => {
-        const cart = [{ id: 1, name: 'Espresso', price: 85000, quantity: 1 }];
+        const cart = [{ id: 1, name: 'Espresso', price: 87500, quantity: 1 }];
         const isValid = cart.length > 0;
         expect(isValid).toBe(true);
     });
@@ -359,7 +359,7 @@ describe('LocalStorage Operations', () => {
     });
 
     test('should save cart to localStorage', () => {
-        const cart = [{ id: 1, name: 'Espresso', price: 85000, quantity: 1 }];
+        const cart = [{ id: 1, name: 'Espresso', price: 87500, quantity: 1 }];
         localStorage.setItem('cart', JSON.stringify(cart));
         const saved = JSON.parse(localStorage.getItem('cart'));
         expect(saved.length).toBe(1);
