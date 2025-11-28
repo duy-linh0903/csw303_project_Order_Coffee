@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ Hàng - Coffee Cabin</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-coffee"></i>
+                <span>Coffee Cabin</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Menu</a></li>
+                <li><a href="orders.html" class="nav-link">Lịch Sử Đơn Hàng</a></li>
+                <li><a href="membercard.html" class="nav-link">Thẻ Thành Viên</a></li>
+                <li><a href="cart.html" class="nav-link active">Giỏ Hàng</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="cart-icon" onclick="window.location.href='cart.html'">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+                <a href="../admin/login.html" class="user-btn" id="authLink">
+                    <i class="fas fa-user"></i>
+                    <span id="authText">Sign In</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Page Content -->
+    <div class="cart-page">
+        <div class="cart-container">
+            <div class="cart-header">
+                <h1><i class="fas fa-shopping-cart"></i> Giỏ Hàng Của Bạn</h1>
+            </div>
+
+            <div class="cart-content">
+                <!-- Cart Items Section -->
+                <div class="cart-items-section">
+                    <h2><i class="fas fa-list"></i> Sản Phẩm (<span id="itemCount">0</span>)</h2>
+                    
+                    <div id="cartItemsContainer">
+                        <!-- Cart items will be rendered here by JavaScript -->
+                        <div class="cart-empty-state" id="emptyState">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h3>Giỏ hàng trống</h3>
+                            <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+                            <button class="checkout-btn" onclick="window.location.href='../index.html'">
+                                <i class="fas fa-arrow-left"></i> Quay Lại Menu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart Summary Section -->
+                <div class="cart-summary-section" id="summarySection" style="display: none;">
+                    <h2>Tóm Tắt Đơn Hàng</h2>
+
+                    <!-- Member Info -->
+                    <div class="member-info-card" id="memberCard" style="display: none;">
+                        <i class="fas fa-crown"></i>
+                        <h3 id="memberTier">Thẻ Vàng</h3>
+                        <p id="memberDiscount">Giảm giá 10%</p>
+                    </div>
+
+                    <!-- Points Redemption -->
+                    <div class="promo-section" id="pointsSection" style="display: none;">
+                        <div class="points-header" onclick="togglePointsOptions()">
+                            <h3><i class="fas fa-star"></i> Đổi Điểm</h3>
+                            <i class="fas fa-chevron-down points-toggle-icon" id="pointsToggleIcon"></i>
+                        </div>
+                        <p class="points-balance">Điểm hiện có: <strong id="userPoints">0</strong></p>
+                        <div class="points-options" id="pointsOptions" style="display: none;">
+                            <!-- Points options will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Promo Code -->
+                    <div class="promo-section">
+                        <h3><i class="fas fa-tag"></i> Mã Giảm Giá</h3>
+                        <div class="promo-input-group">
+                            <input type="text" class="promo-input" id="promoCode" placeholder="Nhập mã giảm giá">
+                            <button class="apply-promo-btn" onclick="applyPromoCode()">Áp Dụng</button>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="summary-row">
+                        <span>Tạm tính:</span>
+                        <span id="subtotalAmount">0₫</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Thuế (10%):</span>
+                        <span id="taxAmount">0₫</span>
+                    </div>
+                    <div class="summary-row discount" id="discountRow" style="display: none;">
+                        <span>Giảm giá:</span>
+                        <span id="discountAmount">-0₫</span>
+                    </div>
+                    <div class="summary-row discount" id="pointsDiscountRow" style="display: none;">
+                        <span>Giảm giá (Điểm):</span>
+                        <span id="pointsDiscountAmount">-0₫</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Tổng cộng:</span>
+                        <span id="totalAmount">0₫</span>
+                    </div>
+
+                    <!-- Checkout Actions -->
+                    <div class="checkout-actions">
+                        <button class="checkout-btn" onclick="proceedToCheckout()">
+                            <i class="fas fa-credit-card"></i> Thanh Toán
+                        </button>
+                        <button class="continue-shopping-btn" onclick="window.location.href='../index.html'">
+                            <i class="fas fa-arrow-left"></i> Tiếp Tục Mua Sắm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal (Guest) -->
+    <div id="guestModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeGuestModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+                <i class="fas fa-user"></i> Thông tin khách hàng
+            </h2>
+            <form id="guestForm" onsubmit="submitGuestInfo(event)">
+                <div class="form-group">
+                    <label for="guestName">
+                        <i class="fas fa-user"></i> Họ và tên <span style="color: red;">*</span>
+                    </label>
+                    <input type="text" id="guestName" required placeholder="Nguyễn Văn A">
+                </div>
+                <div class="form-group">
+                    <label for="guestPhone">
+                        <i class="fas fa-phone"></i> Số điện thoại <span style="color: red;">*</span>
+                    </label>
+                    <input type="tel" id="guestPhone" required placeholder="0912345678" pattern="[0-9]{10,11}">
+                </div>
+                <button type="submit" class="btn-primary btn-full">
+                    <i class="fas fa-arrow-right"></i> Tiếp tục
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="closeCheckoutModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">
+                <i class="fas fa-credit-card"></i> Xác nhận thanh toán
+            </h2>
+            
+            <div style="background: var(--light-color); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                <h3 style="color: var(--dark-color); margin-bottom: 1rem;">Tóm tắt đơn hàng</h3>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Tạm tính:</span>
+                    <span id="checkoutSubtotal">0₫</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Thuế:</span>
+                    <span id="checkoutTax">0₫</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;" id="checkoutDiscountRow">
+                    <span>Giảm giá:</span>
+                    <span id="checkoutDiscount" style="color: var(--accent-color);">-0₫</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid var(--primary-color); font-size: 1.2rem; font-weight: bold;">
+                    <span>Tổng cộng:</span>
+                    <span id="checkoutTotal">0₫</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-wallet"></i> Phương thức thanh toán</label>
+                <select id="paymentMethod" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px;">
+                    <option value="cash">Tiền mặt</option>
+                    <option value="momo">Ví MoMo</option>
+                    <option value="card">Thẻ tín dụng/ghi nợ</option>
+                    <option value="banking">Chuyển khoản ngân hàng</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="deliveryCheckbox" onchange="toggleDeliveryOption()">
+                    <i class="fas fa-shipping-fast"></i> Giao hàng tận nơi (+23.000₫)
+                </label>
+            </div>
+
+            <button class="btn-primary btn-full" onclick="placeOrder()">
+                <i class="fas fa-check-circle"></i> Xác nhận đặt hàng
+            </button>
+        </div>
+    </div>
+
+    <!-- Delivery Address Modal -->
+    <div id="deliveryModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeDeliveryModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+                <i class="fas fa-shipping-fast"></i> Thông tin giao hàng
+            </h2>
+            <p style="color: #666; margin-bottom: 1rem;">
+                Phí giao hàng: <strong style="color: var(--accent-color);">23.000₫</strong>
+            </p>
+            <form id="deliveryForm" onsubmit="submitDeliveryInfo(event)">
+                <div class="form-group">
+                    <label for="deliveryAddress">
+                        <i class="fas fa-map-marker-alt"></i> Địa chỉ giao hàng <span style="color: red;">*</span>
+                    </label>
+                    <textarea id="deliveryAddress" required
+                        placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryNote">
+                        <i class="fas fa-sticky-note"></i> Ghi chú giao hàng (tùy chọn)
+                    </label>
+                    <textarea id="deliveryNote" placeholder="Ghi chú cho người giao hàng..." rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-primary btn-full">
+                    <i class="fas fa-check"></i> Xác nhận giao hàng
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customize Item Modal -->
+    <div id="customizeModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="closeCustomizeModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+                <i class="fas fa-edit"></i> Tùy Chỉnh Đồ Uống
+            </h2>
+            <div id="customizeContent">
+                <!-- Customize form will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/cart.js"></script>
+</body>
+</html>

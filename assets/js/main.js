@@ -1630,3 +1630,5 @@ function handleOrderDetailSubmit() {
     showNotification(`${currentOrderItem.name} added to cart!`);
     currentOrderItem = null;
 }
+
+
