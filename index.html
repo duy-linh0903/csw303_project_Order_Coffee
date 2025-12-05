@@ -175,7 +175,37 @@
                         <span>Total:</span>
                         <span id="total">0₫</span>
                     </div>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    
+                    <!-- Group Order Status (shown when in group) -->
+                    <div id="groupOrderStatus" style="display: none; background: linear-gradient(135deg, #6f4e37, #d4a574); padding: 1rem; border-radius: 8px; margin-top: 1rem; color: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.9rem; opacity: 0.9;">
+                                    <i class="fas fa-users"></i> Đang trong phòng
+                                </div>
+                                <div style="font-weight: 600; font-size: 1.1rem;" id="currentGroupRoomName"></div>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button onclick="viewGroupOrderDetails()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.3s;" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="leaveGroupRoom()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; transition: all 0.3s;">
+                                    <i class="fas fa-sign-out-alt"></i> Rời phòng
+                                </button>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.85rem; opacity: 0.9;">
+                            <i class="fas fa-key"></i> Mã: <strong id="currentGroupRoomCode" style="letter-spacing: 1px; font-family: monospace;"></strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Add to Group Order Button (shown when in group) -->
+                    <button class="btn-success" id="addToGroupBtn" onclick="addCartToGroupOrder()" style="width: 100%; margin-top: 0.75rem; display: none; background: linear-gradient(135deg, #28a745, #20c997); border: none; color: white; padding: 0.875rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
+                        <i class="fas fa-plus-circle"></i> Thêm vào đơn hàng nhóm
+                    </button>
+                    
+                    <!-- Regular Checkout Buttons -->
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
                         <button class="btn-primary" id="deliveryBtn" style="flex: 1;">
                             <i class="fas fa-shipping-fast"></i> Giao hàng
                         </button>
@@ -183,6 +213,11 @@
                             <i class="fas fa-store"></i> Nhận tại quán
                         </button>
                     </div>
+                    
+                    <!-- Join/Create Group Button (shown when not in group) -->
+                    <button class="btn-secondary" id="groupOrderBtn" style="width: 100%; margin-top: 0.5rem;">
+                        <i class="fas fa-users"></i> Tham gia/Tạo phòng
+                    </button>
                 </div>
             </div>
         </div>
@@ -575,7 +610,100 @@
         </div>
     </div>
 
+    <!-- Group Order Modal -->
+    <div id="groupOrderModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="closeGroupOrderModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">
+                <i class="fas fa-users"></i> Đặt hàng nhóm
+            </h2>
+            
+            <div id="groupOrderTabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #eee;">
+                <button class="group-tab active" onclick="switchGroupTab('create')">
+                    <i class="fas fa-plus-circle"></i> Tạo phòng
+                </button>
+                <button class="group-tab" onclick="switchGroupTab('join')">
+                    <i class="fas fa-sign-in-alt"></i> Tham gia
+                </button>
+            </div>
+
+            <!-- Create Group Order -->
+            <div id="createGroupTab" class="group-tab-content">
+                <p style="color: #666; margin-bottom: 1.5rem;">
+                    Tạo phòng đặt hàng chung để bạn bè cùng thêm món vào giỏ hàng
+                </p>
+                <form id="createGroupForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Tên phòng <span style="color: red;">*</span></label>
+                        <input type="text" id="groupRoomName" required placeholder="Ví dụ: Team Coffee Break">
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">
+                        <i class="fas fa-plus"></i> Tạo phòng
+                    </button>
+                </form>
+            </div>
+
+            <!-- Join Group Order -->
+            <div id="joinGroupTab" class="group-tab-content" style="display: none;">
+                <p style="color: #666; margin-bottom: 1.5rem;">
+                    Nhập mã phòng để tham gia đặt hàng nhóm
+                </p>
+                <form id="joinGroupForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-key"></i> Mã phòng <span style="color: red;">*</span></label>
+                        <input type="text" id="groupRoomCode" required placeholder="Nhập mã 6 ký tự" 
+                               maxlength="6" style="text-transform: uppercase;">
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i> Tham gia
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group Order Room Modal -->
+    <div id="groupRoomModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeGroupRoom()">&times;</span>
+            <div class="group-room-header">
+                <div>
+                    <h2 id="groupRoomTitle"><i class="fas fa-users"></i> Phòng đặt hàng</h2>
+                    <div class="group-room-code">
+                        Mã phòng: <strong id="displayGroupCode"></strong>
+                        <button class="btn-icon" onclick="copyGroupCode()" title="Copy mã">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="group-room-actions">
+                    <button class="btn-secondary" onclick="shareGroupLink()">
+                        <i class="fas fa-share-alt"></i> Chia sẻ link
+                    </button>
+                    <button class="btn-primary" onclick="checkoutGroupOrder()" id="groupCheckoutBtn">
+                        <i class="fas fa-cash-register"></i> Thanh toán (<span id="groupTotalAmount">0₫</span>)
+                    </button>
+                </div>
+            </div>
+
+            <div class="group-room-content">
+                <!-- Participants List -->
+                <div class="group-participants">
+                    <h3><i class="fas fa-user-friends"></i> Thành viên (<span id="participantCount">0</span>)</h3>
+                    <div id="participantsList"></div>
+                </div>
+
+                <!-- Group Orders -->
+                <div class="group-orders">
+                    <h3><i class="fas fa-shopping-bag"></i> Đơn hàng nhóm</h3>
+                    <div id="groupOrdersList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/groupOrder.js"></script>
 </body>
 
 </html>

@@ -346,6 +346,13 @@ function removeFromCart(index) {
     showNotification('Item removed from cart');
 }
 
+// Clear entire cart
+function clearCart() {
+    cart = [];
+    updateCart();
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
 // Get member card tier benefits
 function getMemberTierBenefits() {
     if (!currentUser) return { 
@@ -1306,24 +1313,47 @@ function handlePayment() {
         }
     }
 
-    // Process payment - Parse Vietnamese formatted numbers (e.g., "979.687,5₫" becomes 979687.5)
-    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
-    const tax = parseFloat(document.getElementById('tax').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
-    const discount = parseFloat(document.getElementById('discount').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
-    const delivery = isDelivery ? deliveryFee : 0;
-    const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+    // Check if this is a group order payment
+    const pendingGroupOrder = typeof completeGroupOrderPayment !== 'undefined' ? completeGroupOrderPayment() : null;
     
-    // Apply member tier point multiplier
-    const memberBenefits = getMemberTierBenefits();
-    const basePoints = Math.floor(total / 10000);
-    const pointsEarned = basePoints * memberBenefits.pointMultiplier;
+    let subtotal, tax, discount, delivery, total, cart_items, pointsEarned;
+    let isGroupOrder = false;
+    
+    if (pendingGroupOrder) {
+        // Group order payment
+        isGroupOrder = true;
+        subtotal = pendingGroupOrder.subtotal;
+        tax = pendingGroupOrder.tax;
+        discount = 0;
+        delivery = 0;
+        total = pendingGroupOrder.total;
+        cart_items = pendingGroupOrder.orders;
+        
+        // Points earned by host
+        const memberBenefits = getMemberTierBenefits();
+        const basePoints = Math.floor(total / 10000);
+        pointsEarned = basePoints * memberBenefits.pointMultiplier;
+    } else {
+        // Regular payment - Parse Vietnamese formatted numbers (e.g., "979.687,5₫" becomes 979687.5)
+        subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+        tax = parseFloat(document.getElementById('tax').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+        discount = parseFloat(document.getElementById('discount').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+        delivery = isDelivery ? deliveryFee : 0;
+        total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
+        cart_items = JSON.parse(JSON.stringify(cart));
+        
+        // Apply member tier point multiplier
+        const memberBenefits = getMemberTierBenefits();
+        const basePoints = Math.floor(total / 10000);
+        pointsEarned = basePoints * memberBenefits.pointMultiplier;
+    }
 
     // Create order object for admin
     const order = {
         id: 'ORD' + Date.now(),
         customerName: currentUser ? currentUser.name : (guestInfo ? guestInfo.name : 'Guest'),
         customerEmail: currentUser ? currentUser.email : 'guest@example.com',
-        items: JSON.parse(JSON.stringify(cart)), // Deep copy
+        items: cart_items,
         subtotal: subtotal,
         tax: tax,
         discount: discount,
@@ -1332,8 +1362,18 @@ function handlePayment() {
         total: total,
         status: 'pending',
         date: new Date().toISOString(),
-        paymentMethod: paymentMethod
+        paymentMethod: paymentMethod,
+        isGroupOrder: isGroupOrder
     };
+    
+    // Add group order info if applicable
+    if (isGroupOrder && pendingGroupOrder) {
+        order.groupOrderInfo = {
+            roomCode: pendingGroupOrder.roomCode,
+            roomName: pendingGroupOrder.roomName,
+            participants: pendingGroupOrder.participants
+        };
+    }
     
     // Add guest information to order if not logged in
     if (!currentUser && guestInfo) {
@@ -1884,10 +1924,12 @@ function handleOrderDetailSubmit() {
         ...currentOrderItem,
         quantity: quantity,
         customizations: customizations,
+        price: itemPrice, // Price per item for group order
         totalPrice: itemPrice,
         uniqueId: Date.now() // To distinguish items with different customizations
     };
     
+    // Always add to personal cart first
     cart.push(cartItem);
     updateCart();
     

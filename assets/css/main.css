@@ -2341,6 +2341,244 @@ body {
     }
 }
 
+/* Group Order Styles */
+.group-tab {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #666;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.group-tab:hover {
+    color: var(--primary-color);
+}
+
+.group-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.group-tab-content {
+    animation: fadeIn 0.3s ease;
+}
+
+.group-room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.group-room-code {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.group-room-code strong {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    font-family: monospace;
+}
+
+.btn-icon {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.group-room-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.group-room-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.5rem;
+}
+
+.group-participants {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+.group-participants h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.participant-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.participant-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.participant-info {
+    flex: 1;
+}
+
+.participant-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 0.2rem;
+}
+
+.participant-role {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.participant-host {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.group-orders {
+    background: white;
+}
+
+.group-orders h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.group-order-item {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.group-order-item:hover {
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 12px rgba(111, 78, 55, 0.1);
+}
+
+.group-order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eee;
+}
+
+.group-order-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.group-order-user i {
+    color: var(--secondary-color);
+}
+
+.group-order-products {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.group-product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.group-product-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.group-product-quantity {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.group-product-name {
+    font-weight: 500;
+}
+
+.group-product-details {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.2rem;
+}
+
+.group-product-price {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.empty-group-orders {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+}
+
+.empty-group-orders i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav-menu {
@@ -2383,6 +2621,33 @@ body {
 
     .form-row {
         grid-template-columns: 1fr;
+    }
+    
+    /* Group Order Responsive */
+    .group-room-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .group-room-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .group-room-actions button {
+        width: 100%;
+    }
+    
+    .group-room-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .group-participants {
+        order: 2;
+    }
+    
+    .group-orders {
+        order: 1;
     }
 
     .order-detail-container {
