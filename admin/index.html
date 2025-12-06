@@ -165,10 +165,26 @@
         <section id="menu-management" class="content-section">
             <div class="section-header">
                 <h1>Menu Management</h1>
-                <button class="btn-primary" onclick="openAddItemModal()">
-                    <i class="fas fa-plus"></i> Add New Item
-                </button>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn-secondary" onclick="openCustomizeOptionsModal()">
+                        <i class="fas fa-sliders-h"></i> Customize Options
+                    </button>
+                    <button class="btn-primary" onclick="openAddItemModal()">
+                        <i class="fas fa-plus"></i> Add New Item
+                    </button>
+                </div>
             </div>
+            
+            <!-- Customize Options Preview -->
+            <div class="customize-preview" style="background: #f8f9fa; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    <i class="fas fa-cog"></i> Current Customize Options
+                </h3>
+                <div id="customizeOptionsPreview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <!-- Options will be loaded here -->
+                </div>
+            </div>
+            
             <div class="menu-grid" id="adminMenuGrid">
                 <!-- Menu items will be loaded here -->
             </div>
@@ -481,6 +497,87 @@
             <h2>Thông tin khách hàng</h2>
             <div id="customerDetailContent">
                 <!-- Customer details will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Customize Options Modal -->
+    <div id="customizeOptionsModal" class="modal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-sliders-h"></i> Quản Lý Customize Options</h2>
+            <p style="color: #666; margin-bottom: 1.5rem;">
+                Cài đặt các tùy chọn customize chung áp dụng cho tất cả sản phẩm trong menu.
+                <br><strong>Lưu ý:</strong> Khi lưu thay đổi, tất cả món trong menu sẽ sử dụng các tùy chọn này.
+            </p>
+            
+            <div class="customize-options-manager">
+                <!-- Size Options -->
+                <div class="option-section">
+                    <h3><i class="fas fa-arrows-alt"></i> Size Options</h3>
+                    <div class="option-items-container" id="sizeOptions">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                    <button class="btn-secondary" onclick="addSizeOption()">
+                        <i class="fas fa-plus"></i> Add Size
+                    </button>
+                </div>
+
+                <!-- Sugar Level Options -->
+                <div class="option-section">
+                    <h3><i class="fas fa-cube-sugar"></i> Sugar Level</h3>
+                    <div class="option-items-container" id="sugarOptions">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                    <button class="btn-secondary" onclick="addSugarOption()">
+                        <i class="fas fa-plus"></i> Add Sugar Level
+                    </button>
+                </div>
+
+                <!-- Ice Level Options -->
+                <div class="option-section">
+                    <h3><i class="fas fa-snowflake"></i> Ice Level</h3>
+                    <div class="option-items-container" id="iceOptions">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                    <button class="btn-secondary" onclick="addIceOption()">
+                        <i class="fas fa-plus"></i> Add Ice Level
+                    </button>
+                </div>
+
+                <!-- Milk Type Options -->
+                <div class="option-section">
+                    <h3><i class="fas fa-glass-whiskey"></i> Milk Type</h3>
+                    <div class="option-items-container" id="milkOptions">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                    <button class="btn-secondary" onclick="addMilkOption()">
+                        <i class="fas fa-plus"></i> Add Milk Type
+                    </button>
+                </div>
+
+                <!-- Extra Shot Price -->
+                <div class="option-section">
+                    <h3><i class="fas fa-coffee"></i> Extra Shot</h3>
+                    <div class="form-group" style="margin: 0;">
+                        <label style="margin-bottom: 0.5rem; display: block; color: #495057; font-weight: 500;">
+                            Giá mỗi shot thêm (₫)
+                        </label>
+                        <input type="number" id="extraShotPrice" step="1000" placeholder="Ví dụ: 15000" style="width: 100%;">
+                        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">
+                            Giá này sẽ được nhân với số lượng shot (+1, +2...)
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn-secondary" onclick="closeCustomizeOptionsModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn-primary" onclick="saveCustomizeOptions()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
             </div>
         </div>
     </div>

@@ -259,7 +259,7 @@ function filterOrders(status) {
             <td><strong>#${order.id}</strong></td>
             <td>${order.customerName}</td>
             <td>${order.items.length} items</td>
-            <td><strong>$${order.total.toFixed(2)}</strong></td>
+            <td><strong>${formatVND(order.total)}</strong></td>
             <td><span class="status-badge status-${order.status}">${order.status}</span></td>
             <td>${new Date(order.date).toLocaleDateString()}</td>
             <td>
@@ -1666,5 +1666,304 @@ showSection = function(sectionId) {
         setTimeout(() => {
             loadAnalytics();
         }, 100);
+    } else if (sectionId === 'menu-management') {
+        // Load customize options when menu management is shown
+        loadCustomizeOptionsPreview();
     }
 };
+
+// ===========================================
+// CUSTOMIZE OPTIONS MANAGEMENT
+// ===========================================
+
+// Default customize options
+const defaultCustomizeOptions = {
+    sizes: [
+        { value: 'small', label: 'Small', priceMultiplier: 0.8 },
+        { value: 'medium', label: 'Medium', priceMultiplier: 1.0 },
+        { value: 'large', label: 'Large', priceMultiplier: 1.2 }
+    ],
+    sugarLevels: [
+        { value: '0', label: '0%' },
+        { value: '25', label: '25%' },
+        { value: '50', label: '50%' },
+        { value: '75', label: '75%' },
+        { value: '100', label: '100%' }
+    ],
+    iceLevels: [
+        { value: 'no-ice', label: 'No Ice' },
+        { value: 'less-ice', label: 'Less Ice' },
+        { value: 'normal-ice', label: 'Normal Ice' }
+    ],
+    milkTypes: [
+        { value: 'no-milk', label: 'No Milk', price: 0 },
+        { value: 'regular', label: 'Regular Milk', price: 0 },
+        { value: 'soy', label: 'Soy Milk', price: 5000 },
+        { value: 'almond', label: 'Almond Milk', price: 8000 },
+        { value: 'oat', label: 'Oat Milk', price: 8000 }
+    ],
+    extraShotPrice: 15000
+};
+
+// Get customize options from localStorage
+function getCustomizeOptions() {
+    const saved = localStorage.getItem('customizeOptions');
+    return saved ? JSON.parse(saved) : defaultCustomizeOptions;
+}
+
+// Save customize options to localStorage
+function saveCustomizeOptionsToStorage(options) {
+    localStorage.setItem('customizeOptions', JSON.stringify(options));
+}
+
+// Open customize options modal
+function openCustomizeOptionsModal() {
+    const modal = document.getElementById('customizeOptionsModal');
+    modal.style.display = 'block';
+    
+    loadCustomizeOptionsForm();
+}
+
+// Close customize options modal
+function closeCustomizeOptionsModal() {
+    const modal = document.getElementById('customizeOptionsModal');
+    modal.style.display = 'none';
+}
+
+// Load customize options into form
+function loadCustomizeOptionsForm() {
+    const options = getCustomizeOptions();
+    
+    // Load sizes
+    const sizeOptions = document.getElementById('sizeOptions');
+    sizeOptions.innerHTML = `
+        <div class="option-header">
+            <span>Giá trị (value)</span>
+            <span>Tên hiển thị</span>
+            <span>Hệ số giá (1.0 = 100%)</span>
+            <span></span>
+        </div>
+    ` + options.sizes.map((size, index) => `
+        <div class="option-item size-item">
+            <input type="text" placeholder="small, medium, large" value="${size.value}" data-type="size" data-index="${index}" data-field="value">
+            <input type="text" placeholder="Small, Medium, Large" value="${size.label}" data-type="size" data-index="${index}" data-field="label">
+            <input type="number" step="0.1" placeholder="1.0" value="${size.priceMultiplier}" data-type="size" data-index="${index}" data-field="priceMultiplier" title="Ví dụ: 1.0 = 100%, 1.5 = 150%, 0.8 = 80%">
+            <button class="btn-delete" onclick="removeOption('size', ${index})" title="Xóa">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+    
+    // Load sugar levels
+    const sugarOptions = document.getElementById('sugarOptions');
+    sugarOptions.innerHTML = `
+        <div class="option-header">
+            <span>Giá trị (value)</span>
+            <span>Tên hiển thị</span>
+            <span></span>
+        </div>
+    ` + options.sugarLevels.map((sugar, index) => `
+        <div class="option-item">
+            <input type="text" placeholder="0%, 25%, 50%, 75%, 100%" value="${sugar.value}" data-type="sugar" data-index="${index}" data-field="value">
+            <input type="text" placeholder="No Sugar, 25%, 50%..." value="${sugar.label}" data-type="sugar" data-index="${index}" data-field="label">
+            <button class="btn-delete" onclick="removeOption('sugar', ${index})" title="Xóa">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+    
+    // Load ice levels
+    const iceOptions = document.getElementById('iceOptions');
+    iceOptions.innerHTML = `
+        <div class="option-header">
+            <span>Giá trị (value)</span>
+            <span>Tên hiển thị</span>
+            <span></span>
+        </div>
+    ` + options.iceLevels.map((ice, index) => `
+        <div class="option-item">
+            <input type="text" placeholder="no-ice, less-ice, normal, extra-ice" value="${ice.value}" data-type="ice" data-index="${index}" data-field="value">
+            <input type="text" placeholder="No Ice, Less Ice, Normal..." value="${ice.label}" data-type="ice" data-index="${index}" data-field="label">
+            <button class="btn-delete" onclick="removeOption('ice', ${index})" title="Xóa">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+    
+    // Load milk types
+    const milkOptions = document.getElementById('milkOptions');
+    milkOptions.innerHTML = `
+        <div class="option-header">
+            <span>Giá trị (value)</span>
+            <span>Tên hiển thị</span>
+            <span>Giá phụ thu (₫)</span>
+            <span></span>
+        </div>
+    ` + options.milkTypes.map((milk, index) => `
+        <div class="option-item milk-item">
+            <input type="text" placeholder="regular, soy, almond, oat" value="${milk.value}" data-type="milk" data-index="${index}" data-field="value">
+            <input type="text" placeholder="Regular, Soy Milk, Almond..." value="${milk.label}" data-type="milk" data-index="${index}" data-field="label">
+            <input type="number" step="1000" placeholder="0, 12500, 15000" value="${milk.price}" data-type="milk" data-index="${index}" data-field="price" title="Giá cộng thêm cho loại sữa này (VD: 12500)">
+            <button class="btn-delete" onclick="removeOption('milk', ${index})" title="Xóa">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+    
+    // Load extra shot price
+    document.getElementById('extraShotPrice').value = options.extraShotPrice;
+}
+
+// Add new option
+function addSizeOption() {
+    const options = getCustomizeOptions();
+    options.sizes.push({ value: '', label: '', priceMultiplier: 1.0 });
+    saveCustomizeOptionsToStorage(options);
+    loadCustomizeOptionsForm();
+}
+
+function addSugarOption() {
+    const options = getCustomizeOptions();
+    options.sugarLevels.push({ value: '', label: '' });
+    saveCustomizeOptionsToStorage(options);
+    loadCustomizeOptionsForm();
+}
+
+function addIceOption() {
+    const options = getCustomizeOptions();
+    options.iceLevels.push({ value: '', label: '' });
+    saveCustomizeOptionsToStorage(options);
+    loadCustomizeOptionsForm();
+}
+
+function addMilkOption() {
+    const options = getCustomizeOptions();
+    options.milkTypes.push({ value: '', label: '', price: 0 });
+    saveCustomizeOptionsToStorage(options);
+    loadCustomizeOptionsForm();
+}
+
+// Remove option
+function removeOption(type, index) {
+    const options = getCustomizeOptions();
+    
+    switch(type) {
+        case 'size':
+            options.sizes.splice(index, 1);
+            break;
+        case 'sugar':
+            options.sugarLevels.splice(index, 1);
+            break;
+        case 'ice':
+            options.iceLevels.splice(index, 1);
+            break;
+        case 'milk':
+            options.milkTypes.splice(index, 1);
+            break;
+    }
+    
+    saveCustomizeOptionsToStorage(options);
+    loadCustomizeOptionsForm();
+}
+
+// Save customize options
+function saveCustomizeOptions() {
+    const options = getCustomizeOptions();
+    
+    // Update sizes
+    document.querySelectorAll('[data-type="size"]').forEach(input => {
+        const index = parseInt(input.dataset.index);
+        const field = input.dataset.field;
+        const value = field === 'priceMultiplier' ? parseFloat(input.value) : input.value;
+        options.sizes[index][field] = value;
+    });
+    
+    // Update sugar levels
+    document.querySelectorAll('[data-type="sugar"]').forEach(input => {
+        const index = parseInt(input.dataset.index);
+        const field = input.dataset.field;
+        options.sugarLevels[index][field] = input.value;
+    });
+    
+    // Update ice levels
+    document.querySelectorAll('[data-type="ice"]').forEach(input => {
+        const index = parseInt(input.dataset.index);
+        const field = input.dataset.field;
+        options.iceLevels[index][field] = input.value;
+    });
+    
+    // Update milk types
+    document.querySelectorAll('[data-type="milk"]').forEach(input => {
+        const index = parseInt(input.dataset.index);
+        const field = input.dataset.field;
+        const value = field === 'price' ? parseInt(input.value) : input.value;
+        options.milkTypes[index][field] = value;
+    });
+    
+    // Update extra shot price
+    options.extraShotPrice = parseInt(document.getElementById('extraShotPrice').value);
+    
+    // Validate data
+    let hasErrors = false;
+    
+    // Check if all sizes have values
+    if (options.sizes.some(s => !s.value || !s.label)) {
+        showNotification('Please fill in all size fields!', 'error');
+        hasErrors = true;
+    }
+    
+    if (hasErrors) return;
+    
+    // Save to localStorage
+    saveCustomizeOptionsToStorage(options);
+    
+    // Dispatch event to notify other parts of the app
+    window.dispatchEvent(new CustomEvent('customizeOptionsUpdated', { detail: options }));
+    
+    // Close modal and refresh preview
+    closeCustomizeOptionsModal();
+    loadCustomizeOptionsPreview();
+    
+    showNotification('✅ Customize options saved successfully! All menu items will use these options.');
+}
+
+// Load customize options preview
+function loadCustomizeOptionsPreview() {
+    const options = getCustomizeOptions();
+    const preview = document.getElementById('customizeOptionsPreview');
+    
+    if (!preview) return;
+    
+    preview.innerHTML = `
+        <div class="customize-preview-item">
+            <h4><i class="fas fa-arrows-alt"></i> Sizes (${options.sizes.length})</h4>
+            <div>
+                ${options.sizes.map(s => `<span class="badge">${s.label} (x${s.priceMultiplier})</span>`).join('')}
+            </div>
+        </div>
+        <div class="customize-preview-item">
+            <h4><i class="fas fa-cube-sugar"></i> Sugar Levels (${options.sugarLevels.length})</h4>
+            <div>
+                ${options.sugarLevels.map(s => `<span class="badge">${s.label}</span>`).join('')}
+            </div>
+        </div>
+        <div class="customize-preview-item">
+            <h4><i class="fas fa-snowflake"></i> Ice Levels (${options.iceLevels.length})</h4>
+            <div>
+                ${options.iceLevels.map(i => `<span class="badge">${i.label}</span>`).join('')}
+            </div>
+        </div>
+        <div class="customize-preview-item">
+            <h4><i class="fas fa-glass-whiskey"></i> Milk Types (${options.milkTypes.length})</h4>
+            <div>
+                ${options.milkTypes.map(m => `<span class="badge">${m.label}${m.price > 0 ? ' +' + formatVND(m.price) : ''}</span>`).join('')}
+            </div>
+        </div>
+        <div class="customize-preview-item">
+            <h4><i class="fas fa-coffee"></i> Extra Shot</h4>
+            <div>
+                <span class="badge">+${formatVND(options.extraShotPrice)}</span>
+            </div>
+        </div>
+    `;
+}

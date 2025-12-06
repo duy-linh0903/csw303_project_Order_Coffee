@@ -48,6 +48,42 @@ let currentOrderItem = null;
 let isDelivery = false;
 let deliveryFee = 23000;
 let deliveryInfo = null;
+
+// Get customize options from localStorage (set by admin)
+function getCustomizeOptions() {
+    const saved = localStorage.getItem('customizeOptions');
+    if (saved) {
+        return JSON.parse(saved);
+    }
+    // Default options if not set by admin
+    return {
+        sizes: [
+            { value: 'small', label: 'Small', priceMultiplier: 0.8 },
+            { value: 'medium', label: 'Medium', priceMultiplier: 1.0 },
+            { value: 'large', label: 'Large', priceMultiplier: 1.2 }
+        ],
+        sugarLevels: [
+            { value: '0', label: '0%' },
+            { value: '25', label: '25%' },
+            { value: '50', label: '50%' },
+            { value: '75', label: '75%' },
+            { value: '100', label: '100%' }
+        ],
+        iceLevels: [
+            { value: 'no-ice', label: 'No Ice' },
+            { value: 'less-ice', label: 'Less Ice' },
+            { value: 'normal-ice', label: 'Normal Ice' }
+        ],
+        milkTypes: [
+            { value: 'no-milk', label: 'No Milk', price: 0 },
+            { value: 'regular', label: 'Regular Milk', price: 0 },
+            { value: 'soy', label: 'Soy Milk', price: 5000 },
+            { value: 'almond', label: 'Almond Milk', price: 8000 },
+            { value: 'oat', label: 'Oat Milk', price: 8000 }
+        ],
+        extraShotPrice: 15000
+    };
+}
 let memberCardDiscount = 0;
 
 // Initialize
@@ -62,6 +98,16 @@ document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
     initPromotionSlider();
     loadNotifications();
+    
+    // Listen for customize options updates from admin
+    window.addEventListener('customizeOptionsUpdated', function() {
+        // If order detail modal is open, re-render options
+        const modal = document.getElementById('orderDetailModal');
+        if (modal && modal.style.display === 'block' && currentOrderItem) {
+            renderCustomizeOptions();
+            updateDetailTotal();
+        }
+    });
 });
 
 // Promotion Banner Slider
@@ -204,6 +250,79 @@ function addToCart(itemId) {
 }
 
 // Open Order Detail Modal
+// Render customize options from admin settings
+function renderCustomizeOptions() {
+    const options = getCustomizeOptions();
+    const form = document.getElementById('orderDetailForm');
+    
+    // Render Size Options
+    const sizeGroup = form.querySelector('[name="size"]').closest('.option-group');
+    sizeGroup.innerHTML = options.sizes.map((size, index) => {
+        const priceText = size.priceMultiplier !== 1.0 
+            ? ` (${size.priceMultiplier > 1 ? '+' : ''}${Math.round((size.priceMultiplier - 1) * 100)}%)`
+            : '';
+        return `
+            <label class="option-radio">
+                <input type="radio" name="size" value="${size.value}" data-multiplier="${size.priceMultiplier}" ${index === 0 ? 'checked' : ''}>
+                <span>${size.label}${priceText}</span>
+            </label>
+        `;
+    }).join('');
+    
+    // Render Sugar Levels
+    const sugarGroup = form.querySelector('[name="sugar"]').closest('.option-group');
+    sugarGroup.innerHTML = options.sugarLevels.map((sugar, index) => `
+        <label class="option-radio">
+            <input type="radio" name="sugar" value="${sugar.value}" ${index === 0 ? 'checked' : ''}>
+            <span>${sugar.label}</span>
+        </label>
+    `).join('');
+    
+    // Render Ice Levels
+    const iceGroup = form.querySelector('[name="ice"]').closest('.option-group');
+    iceGroup.innerHTML = options.iceLevels.map((ice, index) => `
+        <label class="option-radio">
+            <input type="radio" name="ice" value="${ice.value}" ${index === Math.floor(options.iceLevels.length / 2) ? 'checked' : ''}>
+            <span>${ice.label}</span>
+        </label>
+    `).join('');
+    
+    // Render Milk Types
+    const milkGroup = form.querySelector('[name="milk"]').closest('.option-group');
+    milkGroup.innerHTML = options.milkTypes.map((milk, index) => {
+        const priceText = milk.price > 0 ? ` (+${formatVND(milk.price)})` : '';
+        return `
+            <label class="option-radio">
+                <input type="radio" name="milk" value="${milk.value}" data-price="${milk.price}" ${index === 0 ? 'checked' : ''}>
+                <span>${milk.label}${priceText}</span>
+            </label>
+        `;
+    }).join('');
+    
+    // Render Extra Shots (using extraShotPrice from options)
+    const extraShotPrice = options.extraShotPrice;
+    const extraShotsGroup = form.querySelector('[name="extraShots"]').closest('.option-group');
+    extraShotsGroup.innerHTML = `
+        <label class="option-radio">
+            <input type="radio" name="extraShots" value="0" data-price="0" checked>
+            <span>None</span>
+        </label>
+        <label class="option-radio">
+            <input type="radio" name="extraShots" value="1" data-price="${extraShotPrice}">
+            <span>+1 Shot (+${formatVND(extraShotPrice)})</span>
+        </label>
+        <label class="option-radio">
+            <input type="radio" name="extraShots" value="2" data-price="${extraShotPrice * 2}">
+            <span>+2 Shots (+${formatVND(extraShotPrice * 2)})</span>
+        </label>
+    `;
+    
+    // Add change listeners to update total
+    form.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', updateDetailTotal);
+    });
+}
+
 function openOrderDetail(itemId) {
     currentOrderItem = menuItems.find(i => i.id === itemId);
     
@@ -212,6 +331,9 @@ function openOrderDetail(itemId) {
     document.getElementById('detailName').textContent = currentOrderItem.name;
     document.getElementById('detailDescription').textContent = currentOrderItem.description;
     document.getElementById('detailPrice').textContent = `Giá gốc: ${formatVND(currentOrderItem.price)}`;
+    
+    // Render customize options from admin settings
+    renderCustomizeOptions();
     
     // Show ice option only for iced drinks
     const iceGroup = document.getElementById('iceGroup');
@@ -222,7 +344,6 @@ function openOrderDetail(itemId) {
     }
     
     // Reset form
-    document.getElementById('orderDetailForm').reset();
     document.getElementById('detailQuantity').textContent = '1';
     document.getElementById('orderNotes').value = '';
     
@@ -237,18 +358,26 @@ function updateDetailTotal() {
     let total = currentOrderItem.price;
     const form = document.getElementById('orderDetailForm');
     
-    // Add size cost
-    const size = form.querySelector('input[name="size"]:checked').value;
-    if (size === 'Medium') total += 12500;
-    if (size === 'Large') total += 25000;
+    // Calculate size multiplier (from admin settings)
+    const sizeInput = form.querySelector('input[name="size"]:checked');
+    if (sizeInput) {
+        const multiplier = parseFloat(sizeInput.dataset.multiplier || 1.0);
+        total *= multiplier;
+    }
     
-    // Add milk cost
-    const milk = form.querySelector('input[name="milk"]:checked').value;
-    if (milk !== 'Regular') total += 12500;
+    // Add milk price (from admin settings)
+    const milkInput = form.querySelector('input[name="milk"]:checked');
+    if (milkInput) {
+        const milkPrice = parseFloat(milkInput.dataset.price || 0);
+        total += milkPrice;
+    }
     
-    // Add extra shots cost
-    const extraShots = parseInt(form.querySelector('input[name="extraShots"]:checked').value);
-    total += extraShots * 18750;
+    // Add extra shots price (from admin settings)
+    const extraShotsInput = form.querySelector('input[name="extraShots"]:checked');
+    if (extraShotsInput) {
+        const extraPrice = parseFloat(extraShotsInput.dataset.price || 0);
+        total += extraPrice;
+    }
     
     // Multiply by quantity
     const quantity = parseInt(document.getElementById('detailQuantity').textContent);
