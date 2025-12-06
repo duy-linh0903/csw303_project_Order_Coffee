@@ -896,6 +896,12 @@ function restorePendingCart() {
             if (total > 0) {
                 const paymentModal = document.getElementById('paymentModal');
                 document.getElementById('paymentTotal').textContent = formatVND(total);
+                
+                // Update shop status warning for pickup orders
+                if (typeof updatePaymentShopStatusWarning === 'function') {
+                    updatePaymentShopStatusWarning();
+                }
+                
                 paymentModal.style.display = 'block';
             }
         }, 1000);
@@ -1109,6 +1115,12 @@ function openPaymentModal() {
     const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
     loadAvailableDiscountCodes();
+    
+    // Update shop status warning for pickup orders
+    if (typeof updatePaymentShopStatusWarning === 'function') {
+        updatePaymentShopStatusWarning();
+    }
+    
     paymentModal.style.display = 'block';
 }
 
@@ -1287,6 +1299,12 @@ function openPaymentModalAfterGuestInfo() {
     const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
     loadAvailableDiscountCodes();
+    
+    // Update shop status warning for pickup orders
+    if (typeof updatePaymentShopStatusWarning === 'function') {
+        updatePaymentShopStatusWarning();
+    }
+    
     paymentModal.style.display = 'block';
 }
 
@@ -1295,6 +1313,12 @@ function openPaymentModalWithDelivery() {
     const total = parseFloat(document.getElementById('total').textContent.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, ''));
     document.getElementById('paymentTotal').textContent = formatVND(total);
     loadAvailableDiscountCodes();
+    
+    // Update shop status warning for pickup orders
+    if (typeof updatePaymentShopStatusWarning === 'function') {
+        updatePaymentShopStatusWarning();
+    }
+    
     paymentModal.style.display = 'block';
 }
 
@@ -1392,10 +1416,18 @@ function handlePayment() {
         };
     }
 
+    // Get shop status message BEFORE saving the order (for pickup orders only)
+    const shopStatusMsg = !isDelivery && typeof getShopStatusMessage === 'function' 
+        ? getShopStatusMessage() 
+        : '';
+
     // Save order to orders list (for admin dashboard)
     const orders = JSON.parse(localStorage.getItem('orders') || '[]');
     orders.push(order);
     localStorage.setItem('orders', JSON.stringify(orders));
+
+    // Dispatch event for shop status update
+    window.dispatchEvent(new CustomEvent('orderPlaced'));
 
     // Save order to user orders (for profile page)
     const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
@@ -1453,13 +1485,13 @@ function handlePayment() {
         if (wasDelivery) {
             showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Chúng tôi sẽ giao hàng sớm. Bạn nhận được ${pointsEarned} điểm${multiplierText}!`);
         } else {
-            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng. Bạn nhận được ${pointsEarned} điểm${multiplierText}!`);
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng.${shopStatusMsg} Bạn nhận được ${pointsEarned} điểm${multiplierText}!`);
         }
     } else {
         if (wasDelivery) {
             showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Chúng tôi sẽ giao hàng và liên hệ với bạn sớm!`);
         } else {
-            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng!`);
+            showNotification(`Thanh toán thành công! Đơn hàng ${order.id} đã được tạo. Vui lòng đến quán nhận hàng!${shopStatusMsg}`);
         }
     }
     

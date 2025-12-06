@@ -47,6 +47,21 @@
         </div>
     </nav>
 
+    <!-- Shop Status Banner -->
+    <div id="shopStatusBanner" class="shop-status-banner">
+        <div class="container">
+            <div class="status-content">
+                <div class="status-icon">
+                    <i class="fas fa-circle"></i>
+                </div>
+                <div class="status-text">
+                    <strong id="shopStatusText">Đang tải trạng thái...</strong>
+                    <span id="shopStatusDetail"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
@@ -528,6 +543,15 @@
                     </div>
                 </div>
                 
+                <!-- Shop Status Warning (only for pickup orders) -->
+                <div id="paymentShopStatusWarning" class="payment-shop-status-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Thông báo tình trạng quán</strong>
+                        <p id="paymentShopStatusMessage"></p>
+                    </div>
+                </div>
+                
                 <div class="payment-total">
                     <span>Total Amount:</span>
                     <span id="paymentTotal">0₫</span>
@@ -704,6 +728,7 @@
 
     <script src="assets/js/main.js"></script>
     <script src="assets/js/groupOrder.js"></script>
+    <script src="assets/js/shopStatus.js"></script>
 </body>
 
 </html>

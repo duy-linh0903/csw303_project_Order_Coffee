@@ -2341,6 +2341,99 @@ body {
     }
 }
 
+/* Shop Status Banner */
+.shop-status-banner {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 0.75rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.shop-status-banner.status-busy {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.shop-status-banner.status-full {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Payment Shop Status Warning */
+.payment-shop-status-warning {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.payment-shop-status-warning.status-full {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #ef4444;
+}
+
+.payment-shop-status-warning i {
+    font-size: 1.5rem;
+    color: #f59e0b;
+    margin-top: 0.25rem;
+}
+
+.payment-shop-status-warning.status-full i {
+    color: #ef4444;
+}
+
+.payment-shop-status-warning strong {
+    display: block;
+    color: #92400e;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.payment-shop-status-warning.status-full strong {
+    color: #7f1d1d;
+}
+
+.payment-shop-status-warning p {
+    color: #78350f;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.payment-shop-status-warning.status-full p {
+    color: #991b1b;
+}
+
+.shop-status-banner .status-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.shop-status-banner .status-icon {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.shop-status-banner .status-text {
+    flex: 1;
+}
+
+.shop-status-banner .status-text strong {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.shop-status-banner .status-text span {
+    font-size: 0.9rem;
+    opacity: 0.95;
+}
+
 /* Group Order Styles */
 .group-tab {
     flex: 1;

@@ -381,6 +381,9 @@ function updateOrderStatus(orderId) {
     loadOrders();
     updateDashboard();
     showNotification(`Order #${orderId} status updated to ${order.status}`);
+    
+    // Dispatch event for shop status update
+    window.dispatchEvent(new CustomEvent('orderUpdated'));
 }
 
 // Delete Order
