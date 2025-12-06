@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Tracker Test - Coffee Cabin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        #output {
+            background: #263238;
+            color: #aed581;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 1rem;
+        }
+
+        .status-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        .status-card.delayed {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .status-card.ok {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .badge-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .badge-info {
+            background: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-truck"></i> Delivery Tracker Test Panel</h1>
+        <p class="description">
+            Công cụ test hệ thống theo dõi giao hàng và tạo mã giảm giá đền bù tự động
+        </p>
+
+        <div class="section">
+            <h2><i class="fas fa-play-circle"></i> Quick Actions</h2>
+            <button class="btn btn-primary" onclick="createTestOrder()">
+                <i class="fas fa-plus-circle"></i> Tạo đơn hàng test (giao trễ 20 phút)
+            </button>
+            <button class="btn btn-success" onclick="forceCheck()">
+                <i class="fas fa-sync"></i> Force Check Deliveries
+            </button>
+            <button class="btn btn-warning" onclick="showDelayedOrders()">
+                <i class="fas fa-clock"></i> Xem đơn hàng trễ
+            </button>
+            <button class="btn btn-info" onclick="showCompensationCodes()">
+                <i class="fas fa-gift"></i> Xem mã đền bù
+            </button>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-chart-line"></i> Statistics</h2>
+            <div id="stats"></div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-terminal"></i> Console Output</h2>
+            <div id="output">Waiting for actions...</div>
+        </div>
+    </div>
+
+    <script src="assets/js/deliveryTracker.js"></script>
+    <script src="assets/js/testDeliveryTracker.js"></script>
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            output.innerHTML += `[${timestamp}] ${icon} ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function createTestOrder() {
+            log('Creating test delayed order...', 'info');
+            const order = createTestDelayedOrder();
+            log(`Created order ${order.id} with delivery time 20 minutes ago`, 'success');
+            log('System will detect this as delayed in ~1 minute', 'info');
+            updateStats();
+        }
+
+        function forceCheck() {
+            log('Forcing delivery check...', 'info');
+            forceCheckDeliveries();
+            log('Check completed!', 'success');
+            updateStats();
+        }
+
+        function showDelayedOrders() {
+            log('Checking for delayed orders...', 'info');
+            const delayed = checkDelayedOrders();
+            if (delayed.length === 0) {
+                log('No delayed orders found', 'info');
+            } else {
+                log(`Found ${delayed.length} delayed order(s)`, 'warning');
+            }
+            updateStats();
+        }
+
+        function showCompensationCodes() {
+            log('Fetching compensation codes...', 'info');
+            const codes = checkCompensationCodes();
+            if (codes.length === 0) {
+                log('No compensation codes found', 'info');
+            } else {
+                log(`Found ${codes.length} compensation code(s)`, 'success');
+            }
+            updateStats();
+        }
+
+        function updateStats() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const codes = JSON.parse(localStorage.getItem('discountCodes') || '[]');
+            const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+
+            const deliveryOrders = orders.filter(o => o.isDelivery);
+            const delayedOrders = deliveryOrders.filter(o => {
+                if (o.expectedDeliveryTime && o.status !== 'completed' && o.status !== 'cancelled') {
+                    return new Date() > new Date(o.expectedDeliveryTime);
+                }
+                return false;
+            });
+            const compensationCodes = codes.filter(c => c.type === 'compensation');
+            const compensationNotifs = notifications.filter(n => n.type === 'compensation');
+
+            const statsHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="status-card">
+                        <h3 style="color: #667eea; margin-bottom: 0.5rem;">📦 Total Orders</h3>
+                        <p style="font-size: 2rem; font-weight: bold;">${orders.length}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3 style="color: #667eea; margin-bottom: 0.5rem;">🚚 Delivery Orders</h3>
+                        <p style="font-size: 2rem; font-weight: bold;">${deliveryOrders.length}</p>
+                    </div>
+                    <div class="status-card ${delayedOrders.length > 0 ? 'delayed' : 'ok'}">
+                        <h3 style="color: ${delayedOrders.length > 0 ? '#f44336' : '#4CAF50'}; margin-bottom: 0.5rem;">
+                            ⏰ Delayed Orders
+                        </h3>
+                        <p style="font-size: 2rem; font-weight: bold;">${delayedOrders.length}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3 style="color: #667eea; margin-bottom: 0.5rem;">🎁 Compensation Codes</h3>
+                        <p style="font-size: 2rem; font-weight: bold;">${compensationCodes.length}</p>
+                    </div>
+                </div>
+
+                ${delayedOrders.length > 0 ? `
+                    <div style="margin-top: 1rem;">
+                        <h3 style="color: #f44336; margin-bottom: 0.5rem;">Delayed Orders Details:</h3>
+                        ${delayedOrders.map(order => {
+                            const delayMinutes = Math.floor((new Date() - new Date(order.expectedDeliveryTime)) / 60000);
+                            return `
+                                <div class="status-card delayed" style="margin-bottom: 0.5rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong>${order.id}</strong>
+                                            <br>
+                                            <small>Expected: ${new Date(order.expectedDeliveryTime).toLocaleString()}</small>
+                                            <br>
+                                            <span class="badge badge-danger">Delayed by ${delayMinutes} minutes</span>
+                                            ${order.compensationGiven ? '<span class="badge badge-success">Compensated</span>' : '<span class="badge badge-warning">Pending</span>'}
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <strong>${order.total.toLocaleString()}₫</strong>
+                                            <br>
+                                            <span class="badge badge-info">${order.status}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('stats').innerHTML = statsHTML;
+        }
+
+        // Auto-update stats every 5 seconds
+        setInterval(updateStats, 5000);
+
+        // Initial stats load
+        updateStats();
+        log('Test panel initialized', 'success');
+        log('System will check for delayed deliveries every 1 minute', 'info');
+    </script>
+</body>
+</html>

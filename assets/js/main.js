@@ -1257,12 +1257,20 @@ function showDeliveryModal() {
     const modal = document.getElementById('deliveryModal');
     modal.style.display = 'block';
     
+    // Set minimum delivery time (15 minutes from now)
+    const deliveryTimeInput = document.getElementById('deliveryTime');
+    const now = new Date();
+    const minTime = new Date(now.getTime() + 15 * 60000); // Add 15 minutes
+    deliveryTimeInput.min = minTime.toISOString().slice(0, 16);
+    deliveryTimeInput.value = minTime.toISOString().slice(0, 16);
+    
     // Handle form submission
     const form = document.getElementById('deliveryForm');
     form.onsubmit = function(e) {
         e.preventDefault();
         
         const address = document.getElementById('deliveryAddress').value.trim();
+        const deliveryTime = document.getElementById('deliveryTime').value;
         const note = document.getElementById('deliveryNote').value.trim();
         
         if (!address) {
@@ -1270,9 +1278,25 @@ function showDeliveryModal() {
             return;
         }
         
+        if (!deliveryTime) {
+            showNotification('Vui lòng chọn thời gian giao hàng!');
+            return;
+        }
+        
+        // Validate delivery time (must be at least 15 minutes from now)
+        const selectedTime = new Date(deliveryTime);
+        const currentTime = new Date();
+        const minDeliveryTime = new Date(currentTime.getTime() + 15 * 60000);
+        
+        if (selectedTime < minDeliveryTime) {
+            showNotification('Thời gian giao hàng phải ít nhất 15 phút kể từ bây giờ!');
+            return;
+        }
+        
         // Store delivery information
         deliveryInfo = {
             address: address,
+            deliveryTime: deliveryTime,
             note: note
         };
         
@@ -1412,8 +1436,10 @@ function handlePayment() {
     if (isDelivery && deliveryInfo) {
         order.deliveryInfo = {
             address: deliveryInfo.address,
+            deliveryTime: deliveryInfo.deliveryTime,
             note: deliveryInfo.note
         };
+        order.expectedDeliveryTime = deliveryInfo.deliveryTime;
     }
 
     // Get shop status message BEFORE saving the order (for pickup orders only)

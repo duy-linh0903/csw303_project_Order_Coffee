@@ -303,7 +303,9 @@ function viewOrder(orderId) {
                     <div style="margin-top: 1rem; padding: 1rem; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4CAF50;">
                         <h4 style="color: #2e7d32; margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt"></i> Thông tin giao hàng</h4>
                         <p style="margin: 0.3rem 0;"><strong>Địa chỉ:</strong> ${order.deliveryInfo.address}</p>
+                        ${order.deliveryInfo.deliveryTime ? `<p style="margin: 0.3rem 0;"><strong>Thời gian giao:</strong> ${new Date(order.deliveryInfo.deliveryTime).toLocaleString('vi-VN')}</p>` : ''}
                         ${order.deliveryInfo.note ? `<p style="margin: 0.3rem 0;"><strong>Ghi chú:</strong> ${order.deliveryInfo.note}</p>` : ''}
+                        ${order.compensationGiven ? `<p style="margin: 0.3rem 0; color: #f57c00;"><strong><i class="fas fa-gift"></i> Đã tặng mã đền bù vì giao trễ</strong></p>` : ''}
                     </div>
                 ` : ''}
                 <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
