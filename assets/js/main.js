@@ -32,10 +32,10 @@ function initializeMenuItems() {
 
 // Rewards Data
 const rewardsData = [
-    { id: 1, name: 'Free Coffee', points: 100, discount: 125000 },
-    { id: 2, name: 'Free Pastry', points: 75, discount: 87500 },
-    { id: 3, name: '10% Off', points: 50, discount: 0 },
-    { id: 4, name: 'Free Upgrade', points: 150, discount: 50000 }
+    { id: 1, name: 'Free Coffee', points: 100, type: 'free-cheapest', description: 'Miễn phí 1 món đắt nhất (tối đa 100k)' },
+    { id: 2, name: 'Free Pastry', points: 75, type: 'add-pastry', description: 'Tặng miễn phí 1 pastry (thêm vào đơn)' },
+    { id: 3, name: '10% Off', points: 50, type: 'percentage', discount: 0.1, description: 'Giảm 10% tổng đơn hàng' },
+    { id: 4, name: 'Free Upgrade', points: 150, type: 'free-full-price', description: 'Miễn phí 1 món đắt nhất (bao gồm customize)' }
 ];
 
 // Global State
@@ -501,7 +501,7 @@ function getMemberTierBenefits() {
     if (totalSpending >= 10000000) {
         return { 
             tier: 'diamond', 
-            pointMultiplier: 3, 
+            pointMultiplier: 2, 
             tierName: 'Thẻ Kim Cương',
             freeShipping: true,
             birthdayBonus: 200,
@@ -512,7 +512,7 @@ function getMemberTierBenefits() {
     } else if (totalSpending >= 3000000) {
         return { 
             tier: 'gold', 
-            pointMultiplier: 2, 
+            pointMultiplier: 1.5, 
             tierName: 'Thẻ Vàng',
             freeShipping: true,
             birthdayBonus: 100,
@@ -562,11 +562,90 @@ function updateOrderSummary() {
     // Calculate discount based on reward type
     let finalDiscount = memberDiscount;
     if (appliedReward) {
-        if (appliedReward.name === '10% Off') {
-            finalDiscount += subtotal * 0.1;
-        } else {
-            finalDiscount += appliedDiscount;
+        if (appliedReward.type === 'percentage') {
+            // 10% Off
+            finalDiscount += subtotal * appliedReward.discount;
+        } else if (appliedReward.type === 'free-cheapest') {
+            // Free Coffee - miễn 1 item duy nhất có giá cao nhất (giá gốc + size, không tính milk/shots, tối đa 100.000₫)
+            if (cart.length > 0) {
+                // Tìm item có giá cao nhất (chỉ tính giá gốc * size)
+                let expensiveItem = null;
+                let maxPrice = 0;
+                
+                cart.forEach(item => {
+                    // Lấy giá gốc từ menuItems
+                    const originalItem = menuItems.find(m => m.id === item.id);
+                    const basePrice = originalItem ? originalItem.price : item.price;
+                    
+                    // Tính giá với size (lấy từ form khi add to cart)
+                    let priceWithSize = basePrice;
+                    if (item.customizations && item.customizations.size) {
+                        // Lấy size multiplier từ customize options
+                        const options = getCustomizeOptions();
+                        const sizeOption = options.sizes.find(s => s.value === item.customizations.size);
+                        if (sizeOption) {
+                            priceWithSize = basePrice * sizeOption.priceMultiplier;
+                        }
+                    }
+                    
+                    // So sánh giá (không nhân quantity để tìm item đắt nhất)
+                    if (priceWithSize > maxPrice) {
+                        maxPrice = priceWithSize;
+                        expensiveItem = item;
+                    }
+                });
+                
+                if (expensiveItem) {
+                    // Tính discount = giá gốc * size multiplier (CHỈ 1 ITEM, không nhân quantity)
+                    // Lấy giá gốc từ menuItems - KHÔNG tính member discount, chỉ giá gốc thuần túy
+                    const originalItem = menuItems.find(m => m.id === expensiveItem.id);
+                    const basePrice = originalItem ? originalItem.price : expensiveItem.price;
+                    
+                    let itemDiscount = basePrice;
+                    if (expensiveItem.customizations && expensiveItem.customizations.size) {
+                        const options = getCustomizeOptions();
+                        const sizeOption = options.sizes.find(s => s.value === expensiveItem.customizations.size);
+                        if (sizeOption) {
+                            itemDiscount = basePrice * sizeOption.priceMultiplier;
+                        }
+                    }
+                    
+                    // CHỈ MIỄN 1 ITEM, không nhân với quantity
+                    // Giá này là GIÁ GỐC, không bị ảnh hưởng bởi member discount hay bất kỳ giảm giá nào khác
+                    
+                    // Giới hạn tối đa 100.000₫
+                    finalDiscount += Math.min(itemDiscount, 100000);
+                }
+            }
+        } else if (appliedReward.type === 'free-full-price') {
+            // Free Upgrade - miễn 1 item duy nhất có giá cao nhất (BAO GỐM CẢ CUSTOMIZE)
+            if (cart.length > 0) {
+                // Tìm item có giá cao nhất (bao gồm tất cả: size, milk, extra shots)
+                let expensiveItem = null;
+                let maxFullPrice = 0;
+                
+                cart.forEach(item => {
+                    // Lấy giá đầy đủ từ cart (totalPrice đã bao gồm tất cả customize)
+                    const fullPrice = item.totalPrice || item.price;
+                    
+                    // So sánh giá (đầy đủ, không nhân quantity để tìm item đắt nhất)
+                    if (fullPrice > maxFullPrice) {
+                        maxFullPrice = fullPrice;
+                        expensiveItem = item;
+                    }
+                });
+                
+                if (expensiveItem) {
+                    // Discount = giá đầy đủ của 1 item (bao gồm size, milk, extra shots)
+                    const fullItemPrice = expensiveItem.totalPrice || expensiveItem.price;
+                    
+                    // CHỈ MIỄN 1 ITEM, không nhân với quantity
+                    // Không giới hạn tối đa (khác với Free Coffee)
+                    finalDiscount += fullItemPrice;
+                }
+            }
         }
+        // type === 'add-pastry' không giảm giá, chỉ thêm item
     }
     
     // Add discount from promo codes (memberCardDiscount stores percentage like 0.3 for 30%)
@@ -1673,6 +1752,7 @@ function renderRewards() {
             <div class="reward-item ${isApplied ? 'reward-applied' : ''}">
                 <div class="reward-info">
                     <h4>${reward.name}</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0;">${reward.description}</p>
                     <span class="reward-points">${reward.points} points</span>
                     ${isApplied ? '<span class="reward-badge">Applied</span>' : ''}
                 </div>
@@ -1708,8 +1788,23 @@ function redeemReward(rewardId) {
     
     if (userPoints >= reward.points) {
         userPoints -= reward.points;
-        appliedDiscount = reward.discount;
         appliedReward = reward;
+        
+        // Nếu là Free Pastry, tự động thêm pastry vào cart
+        if (reward.type === 'add-pastry') {
+            const pastryItem = menuItems.find(item => item.category === 'pastry');
+            if (pastryItem) {
+                cart.push({
+                    ...pastryItem,
+                    quantity: 1,
+                    totalPrice: 0, // Miễn phí
+                    price: 0,
+                    isFreeReward: true,
+                    rewardNote: 'Được tặng từ reward Free Pastry'
+                });
+                updateCart();
+            }
+        }
         
         if (currentUser) {
             currentUser.points = userPoints;
@@ -1734,8 +1829,13 @@ function redeemReward(rewardId) {
 // Remove Reward
 function removeReward(rewardId) {
     if (appliedReward && appliedReward.id === rewardId) {
+        // Nếu là Free Pastry, xóa pastry miễn phí khỏi cart
+        if (appliedReward.type === 'add-pastry') {
+            cart = cart.filter(item => !item.isFreeReward);
+            updateCart();
+        }
+        
         userPoints += appliedReward.points;
-        appliedDiscount = 0;
         appliedReward = null;
         
         if (currentUser) {
@@ -1816,10 +1916,13 @@ function displayMemberDiscount(memberBenefits) {
         
         // Point multiplier benefit
         if (memberBenefits.pointMultiplier > 1) {
+            const multiplierText = memberBenefits.pointMultiplier % 1 === 0 
+                ? memberBenefits.pointMultiplier 
+                : memberBenefits.pointMultiplier.toFixed(1);
             benefitsHTML += `
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                     <i class="fas fa-star" style="color: #ffd700;"></i>
-                    <span style="color: var(--primary-color); font-weight: 600;">Tích điểm x${memberBenefits.pointMultiplier}</span>
+                    <span style="color: var(--primary-color); font-weight: 600;">Tích điểm x${multiplierText}</span>
                 </div>
             `;
         }
@@ -2099,12 +2202,29 @@ function handleOrderDetailSubmit() {
         customizations.ice = form.querySelector('input[name="ice"]:checked').value;
     }
     
-    // Calculate total price per item
+    // Calculate total price per item using dynamic options
     let itemPrice = currentOrderItem.price;
-    if (customizations.size === 'Medium') itemPrice += 12500;
-    if (customizations.size === 'Large') itemPrice += 25000;
-    if (customizations.milk !== 'Regular') itemPrice += 12500;
-    itemPrice += customizations.extraShots * 18750;
+    
+    // Apply size multiplier
+    const sizeInput = form.querySelector('input[name="size"]:checked');
+    if (sizeInput) {
+        const multiplier = parseFloat(sizeInput.dataset.multiplier || 1.0);
+        itemPrice *= multiplier;
+    }
+    
+    // Add milk price
+    const milkInput = form.querySelector('input[name="milk"]:checked');
+    if (milkInput) {
+        const milkPrice = parseFloat(milkInput.dataset.price || 0);
+        itemPrice += milkPrice;
+    }
+    
+    // Add extra shots price
+    const extraShotsInput = form.querySelector('input[name="extraShots"]:checked');
+    if (extraShotsInput) {
+        const extraPrice = parseFloat(extraShotsInput.dataset.price || 0);
+        itemPrice += extraPrice;
+    }
     
     // Add to cart
     const cartItem = {
