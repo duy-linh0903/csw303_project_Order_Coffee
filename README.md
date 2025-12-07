@@ -47,16 +47,19 @@ Hệ thống đặt hàng coffee trực tuyến với giao diện hiện đại,
   - Tích điểm thưởng theo hạng thẻ
 - **Xác nhận đơn hàng**: Thông báo chi tiết sau khi đặt hàng thành công
 
-### 🎁 Hệ Thống Điểm Thưởng
+### 🎁 Hệ Thống Điểm Thưởng & Rewards
 - **Tích điểm**: 
-  - 1 điểm cho mỗi 10.000₫ chi tiêu (cập nhật mới)
-  - Nhân điểm theo hạng thẻ (x2 cho Vàng, x3 cho Kim Cương)
-- **Đổi thưởng**:
-  - 10% Off (100 điểm)
-  - 15% Off (150 điểm)
-  - Free Coffee (75 điểm)
-  - 50.000₫ Off (50 điểm)
-- **Quản lý điểm**: Theo dõi điểm tích lũy trong profile
+  - 1 điểm cho mỗi 10.000₫ chi tiêu
+  - Nhân điểm theo hạng thẻ:
+    - Silver: x1 (mặc định)
+    - Gold: x1.5
+    - Diamond: x2
+- **Đổi thưởng đa dạng**:
+  - **Free Coffee** (75 điểm): Miễn phí món đắt nhất (base + size), tối đa 100.000₫
+  - **Free Pastry** (50 điểm): Tặng 1 pastry miễn phí
+  - **Free Upgrade** (100 điểm): Miễn phí món đắt nhất (full price bao gồm customize)
+  - **10% Off** (50 điểm): Giảm 10% tổng đơn hàng
+- **Quản lý điểm**: Theo dõi điểm tích lũy và rewards khả dụng trong profile
 
 ### 📊 Quản Lý Đơn Hàng
 - **Lịch sử đơn hàng**: Xem tất cả đơn hàng đã đặt
@@ -83,7 +86,7 @@ Hệ thống đặt hàng coffee trực tuyến với giao diện hiện đại,
 - **Điều kiện**: Tổng chi tiêu ≥ 3.000.000₫
 - **Ưu đãi**:
   - ✅ Giảm 10% tất cả đơn hàng
-  - ✅ Tích điểm x2
+  - ✅ Tích điểm x1.5 (cập nhật mới)
   - ✅ Sinh nhật tặng 100 điểm
   - ✅ **Miễn phí giao hàng**
   - ✅ Ưu tiên đặt trước
@@ -92,7 +95,7 @@ Hệ thống đặt hàng coffee trực tuyến với giao diện hiện đại,
 - **Điều kiện**: Tổng chi tiêu ≥ 10.000.000₫
 - **Ưu đãi**:
   - ✅ Giảm 15% tất cả đơn hàng
-  - ✅ Tích điểm x3
+  - ✅ Tích điểm x2 (cập nhật mới)
   - ✅ Sinh nhật tặng 200 điểm
   - ✅ **Miễn phí giao hàng**
   - ✅ Sự kiện VIP độc quyền
@@ -231,7 +234,9 @@ http://127.0.0.1:5500
 - Thêm sản phẩm mới
 - Sửa thông tin sản phẩm
 - Xóa sản phẩm
-- Upload hình ảnh
+- **Upload & Crop hình ảnh** (Cropper.js integration)
+- Preview ảnh trong admin grid
+- Hỗ trợ cả URL và upload file
 
 #### Quản Lý Khách Hàng
 - Danh sách khách hàng
@@ -276,6 +281,8 @@ http://127.0.0.1:5500
 ### Libraries & Icons
 - **Font Awesome 6.0**: Icons
 - **Google Fonts**: Typography
+- **Cropper.js 1.6.1**: Image cropping library (Admin panel)
+- **Chart.js 4.4.0**: Analytics charts (Admin panel)
 
 ### Data Storage
 - **LocalStorage**:
@@ -362,7 +369,66 @@ http://127.0.0.1:5500
 ### Known Issues
 - None currently
 
-## 🆕 Tính Năng Mới Nhất
+## 🆕 Tính Năng Mới Nhất (December 2025)
+
+### 🎨 Hero Section với Background Image
+- **Hình ảnh nền đẹp mắt**:
+  - Sử dụng ảnh quán cafe ngoài trời từ thư mục `pictures/`
+  - Parallax scrolling effect (tuỳ chọn)
+  - Gradient overlay cho text dễ đọc
+- **Design hiện đại**:
+  - Khung text trong suốt với backdrop-filter blur
+  - Gradient text cho tiêu đề
+  - Button với hover effect nâng lên
+  - Responsive trên mọi thiết bị
+- **Tuỳ chỉnh linh hoạt**:
+  - Background có thể chuyển sang màu sáng/tối
+  - Khung text có thể có/không có viền
+  - Kích thước và padding có thể điều chỉnh
+
+### 🖼️ Admin Image Upload & Cropping
+- **Upload ảnh từ máy tính**:
+  - Hỗ trợ tất cả định dạng ảnh phổ biến (JPG, PNG, GIF, WebP)
+  - Drag & drop hoặc click để chọn file
+  - Preview ảnh ngay lập tức
+- **Công cụ crop ảnh chuyên nghiệp** (Cropper.js):
+  - Tỷ lệ khung hình 16:9 (phù hợp với menu cards)
+  - Zoom in/out, pan ảnh
+  - Xoay trái/phải (90°)
+  - Lật ngang/dọc
+  - Reset về trạng thái ban đầu
+  - Nút "Chọn ảnh khác" để thay đổi
+- **Hai phương thức thêm ảnh**:
+  - **Tab 1: Upload File** - Upload và crop ảnh từ máy
+  - **Tab 2: Image URL** - Nhập link ảnh từ internet
+  - Tự động tạo gradient nếu không có ảnh
+- **Tối ưu hiển thị**:
+  - Ảnh được crop với kích thước 800x450px (16:9)
+  - Chất lượng JPEG 85% (cân bằng chất lượng và dung lượng)
+  - Lưu dưới dạng base64 trong localStorage
+  - Hiển thị chính xác trong cả admin và user menu
+- **UI/UX cải tiến**:
+  - Preview container với background và border
+  - Buttons điều khiển rõ ràng với icons
+  - Có thể chọn lại ảnh bất cứ lúc nào
+  - Loading states và error handling
+
+### 🎨 Menu Management UI Redesign
+- **Card design hiện đại**:
+  - Border mỏng với shadow nhẹ
+  - Hover effect nâng lên 8px
+  - Thanh gradient xuất hiện khi hover
+  - Bo tròn góc 16px
+- **Layout cải thiện**:
+  - Grid responsive với min-width 300px
+  - Ảnh preview 180px height
+  - Typography hierarchy rõ ràng
+  - Action buttons với gradient backgrounds
+- **Color scheme**:
+  - Category badge với gradient background
+  - Price với gradient text effect
+  - Edit button: Green gradient
+  - Delete button: Red gradient
 
 ### 🎫 Hệ Thống Mã Giảm Giá
 - **Thông báo mã giảm giá**:
@@ -551,6 +617,12 @@ http://127.0.0.1:5500
 - ✅ "Not in group" error after reload → Added session restore
 - ✅ Shop status not updating → Fixed event dispatching
 - ✅ Payment notification missing status → Added before save order
+- ✅ Point multipliers too high → Reduced Gold to 1.5x, Diamond to 2x
+- ✅ Reward system unclear → Redesigned with 4 distinct reward types
+- ✅ Can't re-select image in admin → Added clearImageUpload function
+- ✅ Cropped image not showing correctly → Fixed base64 image handling
+- ✅ Admin menu items syntax error → Fixed missing closing braces
+- ✅ Hero section plain background → Added image background with overlay
 
 ### Current Known Issues
 - None reported
@@ -565,12 +637,18 @@ http://127.0.0.1:5500
 
 ### File Organization
 ```
-assets/js/
-├── main.js           # Core functionality (1950+ lines)
-├── admin.js          # Admin panel logic (1666+ lines)
-├── groupOrder.js     # Group order system (800+ lines)
-├── shopStatus.js     # Shop status management (90+ lines)
-└── membercard.js     # Member card logic
+assets/
+├── js/
+│   ├── main.js           # Core functionality (2200+ lines)
+│   ├── admin.js          # Admin panel logic (2200+ lines)
+│   ├── groupOrder.js     # Group order system (800+ lines)
+│   ├── shopStatus.js     # Shop status management (90+ lines)
+│   └── membercard.js     # Member card logic (500+ lines)
+├── css/
+│   ├── main.css          # Main styles (4850+ lines)
+│   └── admin.css         # Admin panel styles (1750+ lines)
+└── pictures/
+    └── Thiet-ke-quan-cafe-ngoai-troi-2-2.jpeg  # Hero background
 ```
 
 ## 🎓 Learning Outcomes
@@ -598,7 +676,6 @@ This project is part of CSW303 course assignment.
 
 ## 👥 Contributors
 
-- **Duy Linh** - Developer
 - **Course**: CSW303 - Web Programming
 - **Institution**: [Your University Name]
 
@@ -618,5 +695,14 @@ This project is part of CSW303 course assignment.
 
 **Coffee Cabin** - *Nơi mang đến trải nghiệm coffee tuyệt vời với công nghệ hiện đại!* ☕✨
 
-**Phiên bản**: 2.0.0 (December 2025)  
-**Last Updated**: December 6, 2025
+**Phiên bản**: 2.1.0 (December 2025)  
+**Last Updated**: December 7, 2025
+
+### Changelog v2.1.0
+- ✨ Added hero section with background image
+- ✨ Integrated Cropper.js for admin image upload
+- ✨ Redesigned menu management UI
+- 🔧 Updated point multipliers (Gold 1.5x, Diamond 2x)
+- 🔧 Redesigned reward system with 4 types
+- 🐛 Fixed multiple admin panel bugs
+- 🎨 Improved overall UI/UX consistency
