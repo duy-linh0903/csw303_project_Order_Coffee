@@ -443,24 +443,47 @@ function loadCustomers() {
 function loadMenuItems() {
     const adminMenuGrid = document.getElementById('adminMenuGrid');
     
-    adminMenuGrid.innerHTML = menuItems.map(item => `
+    adminMenuGrid.innerHTML = menuItems.map(item => {
+        // Handle both base64 and URL images
+        const backgroundStyle = item.image.startsWith('data:') 
+            ? `background-image: url('${item.image}');` 
+            : `background: ${item.image};`;
+        
+        // Category labels
+        const categoryLabel = {
+            'hot': 'Hot Coffee',
+            'iced': 'Iced Coffee',
+            'special': 'Special'
+        }[item.category] || item.category;
+        
+        return `
         <div class="menu-admin-item">
-            <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">${item.name}</h3>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">${item.description}</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <span style="font-size: 1.2rem; font-weight: bold; color: var(--accent-color);">${formatVND(item.price)}</span>
-                <span class="status-badge" style="background: var(--secondary-color); color: var(--dark-color);">${item.category}</span>
-            </div>
-            <div class="action-btns">
-                <button class="btn-action btn-edit" onclick="editMenuItem(${item.id})" style="flex: 1;">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn-action btn-delete" onclick="deleteMenuItem(${item.id})" style="flex: 1;">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
+            <div class="menu-item-image-admin" style="width: 100%; height: 180px; ${backgroundStyle} background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                    <h3 style="color: var(--primary-color);">${item.name}</h3>
+                    <span class="category-badge" style="background: linear-gradient(135deg, var(--secondary-color), #e8c39e); color: var(--dark-color); padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+                        ${categoryLabel}
+                    </span>
+                </div>
+                <p>${item.description}</p>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0;">
+                    <span style="font-size: 1.3rem; font-weight: 700; color: var(--accent-color); background: linear-gradient(135deg, #ff6b6b, #ff8787); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        ${formatVND(item.price)}
+                    </span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-action btn-edit" onclick="editMenuItem(${item.id})">
+                        <i class="fas fa-edit"></i> <span>Edit</span>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="deleteMenuItem(${item.id})">
+                        <i class="fas fa-trash"></i> <span>Delete</span>
+                    </button>
+                </div>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Setup Event Listeners
@@ -503,22 +526,32 @@ function addMenuItem() {
     const description = document.getElementById('newItemDescription').value;
     const price = parseFloat(document.getElementById('newItemPrice').value);
     const category = document.getElementById('newItemCategory').value;
-    const imageUrl = document.getElementById('newItemImageUrl').value.trim();
-
+    
+    // Check which tab is active
+    const uploadTab = document.getElementById('addUploadTab');
+    const isUploadActive = uploadTab.classList.contains('active');
+    
     let image;
-    if (imageUrl) {
-        // Use provided image URL
-        image = `url('${imageUrl}')`;
+    
+    if (isUploadActive && addCropper) {
+        // Get cropped image from upload
+        const croppedImage = getCroppedImage('add');
+        if (croppedImage) {
+            // Store base64 directly without url() wrapper for better compatibility
+            image = croppedImage;
+        } else {
+            // If cropper failed, use gradient
+            image = generateRandomGradient();
+        }
     } else {
-        // Generate random gradient for image
-        const colors = [
-            ['#6f4e37', '#8B4513'], ['#8B4513', '#A0522D'], ['#D2691E', '#CD853F'],
-            ['#4B3621', '#6F4E37'], ['#4682B4', '#5F9EA0'], ['#87CEEB', '#B0E0E6'],
-            ['#2C3E50', '#34495E'], ['#D4A574', '#E8C39E'], ['#D2691E', '#F4A460'],
-            ['#3E2723', '#5D4037'], ['#F5DEB3', '#FFE4B5'], ['#FF8C00', '#FFA500']
-        ];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        image = `linear-gradient(135deg, ${randomColor[0]}, ${randomColor[1]})`;
+        // Use URL tab
+        const imageUrl = document.getElementById('newItemImageUrl').value.trim();
+        if (imageUrl) {
+            image = `url('${imageUrl}')`;
+        } else {
+            // Generate random gradient if no URL
+            image = generateRandomGradient();
+        }
     }
 
     const newItem = {
@@ -533,9 +566,29 @@ function addMenuItem() {
     menuItems.push(newItem);
     localStorage.setItem('menuItems', JSON.stringify(menuItems));
     loadMenuItems();
+    
+    // Clean up
+    if (addCropper) {
+        addCropper.destroy();
+        addCropper = null;
+    }
+    document.getElementById('addImagePreviewContainer').style.display = 'none';
     document.getElementById('addItemModal').style.display = 'none';
     document.getElementById('addItemForm').reset();
+    
     showNotification('Menu item added successfully');
+}
+
+// Helper function to generate random gradient
+function generateRandomGradient() {
+    const colors = [
+        ['#6f4e37', '#8B4513'], ['#8B4513', '#A0522D'], ['#D2691E', '#CD853F'],
+        ['#4B3621', '#6F4E37'], ['#4682B4', '#5F9EA0'], ['#87CEEB', '#B0E0E6'],
+        ['#2C3E50', '#34495E'], ['#D4A574', '#E8C39E'], ['#D2691E', '#F4A460'],
+        ['#3E2723', '#5D4037'], ['#F5DEB3', '#FFE4B5'], ['#FF8C00', '#FFA500']
+    ];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    return `linear-gradient(135deg, ${randomColor[0]}, ${randomColor[1]})`;
 }
 
 // Edit Menu Item
@@ -550,8 +603,13 @@ function editMenuItem(itemId) {
     document.getElementById('editItemPrice').value = item.price;
     document.getElementById('editItemCategory').value = item.category;
     
-    // Clear image URL field (user can fill if they want to change)
+    // Clear image URL field and preview
     document.getElementById('editItemImageUrl').value = '';
+    document.getElementById('editImagePreviewContainer').style.display = 'none';
+    if (editCropper) {
+        editCropper.destroy();
+        editCropper = null;
+    }
 
     // Show the edit modal
     document.getElementById('editItemModal').style.display = 'block';
@@ -568,16 +626,38 @@ function updateMenuItem() {
     item.price = parseFloat(document.getElementById('editItemPrice').value);
     item.category = document.getElementById('editItemCategory').value;
     
-    // Update image only if new URL is provided
-    const imageUrl = document.getElementById('editItemImageUrl').value.trim();
-    if (imageUrl) {
-        item.image = `url('${imageUrl}')`;
+    // Check which tab is active for image
+    const uploadTab = document.getElementById('editUploadTab');
+    const isUploadActive = uploadTab.classList.contains('active');
+    
+    if (isUploadActive && editCropper) {
+        // Get cropped image from upload
+        const croppedImage = getCroppedImage('edit');
+        if (croppedImage) {
+            // Store base64 directly without url() wrapper for better compatibility
+            item.image = croppedImage;
+        }
+        // Otherwise keep existing image
+    } else {
+        // Use URL tab
+        const imageUrl = document.getElementById('editItemImageUrl').value.trim();
+        if (imageUrl) {
+            item.image = `url('${imageUrl}')`;
+        }
+        // Otherwise keep existing image
     }
-    // Otherwise keep existing image
 
     localStorage.setItem('menuItems', JSON.stringify(menuItems));
     loadMenuItems();
+    
+    // Clean up
+    if (editCropper) {
+        editCropper.destroy();
+        editCropper = null;
+    }
+    document.getElementById('editImagePreviewContainer').style.display = 'none';
     document.getElementById('editItemModal').style.display = 'none';
+    
     showNotification('Menu item updated successfully');
 }
 
@@ -1966,4 +2046,167 @@ function loadCustomizeOptionsPreview() {
             </div>
         </div>
     `;
+}
+
+// Image Cropper functionality
+let addCropper = null;
+let editCropper = null;
+
+// Switch between Upload and URL tabs
+function switchImageTab(modal, tab) {
+    const uploadTab = document.getElementById(`${modal}UploadTab`);
+    const urlTab = document.getElementById(`${modal}UrlTab`);
+    const uploadBtn = uploadTab.previousElementSibling.querySelector('.tab-btn:first-child');
+    const urlBtn = uploadTab.previousElementSibling.querySelector('.tab-btn:last-child');
+    
+    if (tab === 'upload') {
+        uploadTab.classList.add('active');
+        urlTab.classList.remove('active');
+        uploadBtn.classList.add('active');
+        urlBtn.classList.remove('active');
+    } else {
+        uploadTab.classList.remove('active');
+        urlTab.classList.add('active');
+        uploadBtn.classList.remove('active');
+        urlBtn.classList.add('active');
+    }
+}
+
+// Handle image upload
+function handleImageUpload(event, modal) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+        alert('Vui lòng chọn file ảnh!');
+        event.target.value = ''; // Reset file input
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const imagePreview = document.getElementById(`${modal}ImagePreview`);
+        const previewContainer = document.getElementById(`${modal}ImagePreviewContainer`);
+        
+        // Destroy existing cropper if any
+        if (modal === 'add' && addCropper) {
+            addCropper.destroy();
+            addCropper = null;
+        } else if (modal === 'edit' && editCropper) {
+            editCropper.destroy();
+            editCropper = null;
+        }
+        
+        // Update image source
+        imagePreview.src = e.target.result;
+        previewContainer.style.display = 'block';
+        
+        // Wait for image to load before initializing cropper
+        imagePreview.onload = function() {
+            // Initialize new cropper
+            const cropper = new Cropper(imagePreview, {
+                aspectRatio: 16 / 9, // Wider ratio for menu cards (matches menu-item-image height/width ratio)
+                viewMode: 2,
+                dragMode: 'move',
+                autoCropArea: 1,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: true,
+                background: true,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+                minContainerWidth: 300,
+                minContainerHeight: 200,
+                responsive: true,
+                ready: function() {
+                    // Cropper is ready to use
+                    console.log('Cropper initialized for ' + modal);
+                }
+            });
+            
+            if (modal === 'add') {
+                addCropper = cropper;
+            } else {
+                editCropper = cropper;
+            }
+        };
+    };
+    reader.readAsDataURL(file);
+}
+
+// Rotate image
+function rotateImage(modal, degrees) {
+    const cropper = modal === 'add' ? addCropper : editCropper;
+    if (cropper) {
+        cropper.rotate(degrees);
+    }
+}
+
+// Flip image
+function flipImage(modal, direction) {
+    const cropper = modal === 'add' ? addCropper : editCropper;
+    if (!cropper) return;
+    
+    if (direction === 'horizontal') {
+        const currentScaleX = cropper.getData().scaleX || 1;
+        cropper.scaleX(-currentScaleX);
+    } else {
+        const currentScaleY = cropper.getData().scaleY || 1;
+        cropper.scaleY(-currentScaleY);
+    }
+}
+
+// Reset cropper
+function resetCropper(modal) {
+    const cropper = modal === 'add' ? addCropper : editCropper;
+    if (cropper) {
+        cropper.reset();
+    }
+}
+
+// Clear image upload and allow re-selection
+function clearImageUpload(modal) {
+    // Destroy cropper
+    if (modal === 'add' && addCropper) {
+        addCropper.destroy();
+        addCropper = null;
+    } else if (modal === 'edit' && editCropper) {
+        editCropper.destroy();
+        editCropper = null;
+    }
+    
+    // Clear file input
+    const fileInput = document.getElementById(`${modal === 'add' ? 'newItemImageFile' : 'editItemImageFile'}`);
+    if (fileInput) {
+        fileInput.value = '';
+    }
+    
+    // Hide preview container
+    const previewContainer = document.getElementById(`${modal}ImagePreviewContainer`);
+    if (previewContainer) {
+        previewContainer.style.display = 'none';
+    }
+    
+    // Clear image src
+    const imagePreview = document.getElementById(`${modal}ImagePreview`);
+    if (imagePreview) {
+        imagePreview.src = '';
+    }
+}
+
+// Get cropped image as base64
+function getCroppedImage(modal) {
+    const cropper = modal === 'add' ? addCropper : editCropper;
+    if (!cropper) return null;
+    
+    // Create canvas with 16:9 ratio optimized for menu cards
+    return cropper.getCroppedCanvas({
+        width: 800,
+        height: 450,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+        fillColor: '#fff',
+    }).toDataURL('image/jpeg', 0.85);
 }

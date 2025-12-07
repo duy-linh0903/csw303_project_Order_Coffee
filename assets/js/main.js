@@ -190,10 +190,15 @@ function renderMenu(filter) {
         : menuItems.filter(item => item.category === filter);
 
     filteredItems.forEach(item => {
+        // Handle both base64 and URL/gradient images
+        const backgroundStyle = item.image.startsWith('data:') 
+            ? `background-image: url('${item.image}')` 
+            : `background: ${item.image}`;
+        
         const menuItemEl = document.createElement('div');
         menuItemEl.className = 'menu-item';
         menuItemEl.innerHTML = `
-            <div class="menu-item-image" style="background: ${item.image}"></div>
+            <div class="menu-item-image" style="${backgroundStyle}"></div>
             <div class="menu-item-content">
                 <div class="menu-item-header">
                     <h3 class="menu-item-title">${item.name}</h3>

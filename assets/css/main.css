@@ -319,49 +319,91 @@ body {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-image: url('../../pictures/Thiet-ke-quan-cafe-ngoai-troi-2-2.jpeg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
     color: var(--white);
-    padding: 100px 0;
+    padding: 60px 0;
     text-align: center;
-    animation: fadeInUp 0.8s ease-out;
     position: relative;
     overflow: hidden;
-    z-index: 0;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-        45deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
-    animation: shimmer 3s infinite;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 1;
 }
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 2rem;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(139, 69, 19, 0.3);
+    animation: fadeInUp 1s ease-out;
 }
 
 .hero-content h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    animation: fadeInDown 1s;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #5c2e0d;
+    text-transform: uppercase;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        0 0 20px rgba(255, 215, 0, 0.3);
+    animation: fadeInDown 1s ease-out;
+    line-height: 1.2;
 }
 
 .hero-content p {
-    font-size: 1.3rem;
-    margin-bottom: 2rem;
-    animation: fadeInUp 1s;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #6b3410;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.6);
+    animation: fadeInUp 1.2s ease-out;
+    font-style: italic;
+}
+
+.hero-content .btn-primary {
+    padding: 0.9rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, #d4a574, #c19a6b);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s ease;
+    animation: fadeIn 1.5s ease-out;
+}
+
+.hero-content .btn-primary:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(135deg, #c19a6b, #d4a574);
+    border-color: #fff;
 }
 
 /* Promotion Banners Section */
@@ -749,6 +791,7 @@ body {
     height: 220px;
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;

@@ -6,7 +6,9 @@
     <title>Admin Dashboard - Coffee Cabin</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -444,9 +446,34 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Image URL (optional)</label>
-                    <input type="url" id="newItemImageUrl" placeholder="https://example.com/image.jpg hoặc để trống để dùng gradient tự động">
-                    <small style="color: #666; font-size: 0.85rem;">Để trống sẽ tự động tạo gradient màu</small>
+                    <label>Image</label>
+                    <div class="image-upload-tabs">
+                        <button type="button" class="tab-btn active" onclick="switchImageTab('add', 'upload')">Upload File</button>
+                        <button type="button" class="tab-btn" onclick="switchImageTab('add', 'url')">Image URL</button>
+                    </div>
+                    <div id="addUploadTab" class="image-tab active">
+                        <input type="file" id="newItemImageFile" accept="image/*" onchange="handleImageUpload(event, 'add')">
+                        <div id="addImagePreviewContainer" style="display: none; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <small style="color: #666;">Điều chỉnh ảnh của bạn:</small>
+                                <button type="button" class="btn-secondary" onclick="clearImageUpload('add')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                    <i class="fas fa-times"></i> Chọn ảnh khác
+                                </button>
+                            </div>
+                            <img id="addImagePreview" style="max-width: 100%; display: block;">
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button type="button" class="btn-secondary" onclick="rotateImage('add', -90)"><i class="fas fa-undo"></i> Xoay trái</button>
+                                <button type="button" class="btn-secondary" onclick="rotateImage('add', 90)"><i class="fas fa-redo"></i> Xoay phải</button>
+                                <button type="button" class="btn-secondary" onclick="flipImage('add', 'horizontal')"><i class="fas fa-arrows-alt-h"></i> Lật ngang</button>
+                                <button type="button" class="btn-secondary" onclick="flipImage('add', 'vertical')"><i class="fas fa-arrows-alt-v"></i> Lật dọc</button>
+                                <button type="button" class="btn-secondary" onclick="resetCropper('add')"><i class="fas fa-sync"></i> Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="addUrlTab" class="image-tab">
+                        <input type="url" id="newItemImageUrl" placeholder="https://example.com/image.jpg">
+                        <small style="color: #666; font-size: 0.85rem;">Hoặc để trống để dùng gradient tự động</small>
+                    </div>
                 </div>
                 <button type="submit" class="btn-primary btn-full">Add Item</button>
             </form>
@@ -481,9 +508,34 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Image URL (optional)</label>
-                    <input type="url" id="editItemImageUrl" placeholder="https://example.com/image.jpg hoặc để trống để giữ nguyên">
-                    <small style="color: #666; font-size: 0.85rem;">Để trống sẽ giữ nguyên ảnh hiện tại</small>
+                    <label>Image</label>
+                    <div class="image-upload-tabs">
+                        <button type="button" class="tab-btn active" onclick="switchImageTab('edit', 'upload')">Upload File</button>
+                        <button type="button" class="tab-btn" onclick="switchImageTab('edit', 'url')">Image URL</button>
+                    </div>
+                    <div id="editUploadTab" class="image-tab active">
+                        <input type="file" id="editItemImageFile" accept="image/*" onchange="handleImageUpload(event, 'edit')">
+                        <div id="editImagePreviewContainer" style="display: none; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <small style="color: #666;">Điều chỉnh ảnh của bạn:</small>
+                                <button type="button" class="btn-secondary" onclick="clearImageUpload('edit')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                    <i class="fas fa-times"></i> Chọn ảnh khác
+                                </button>
+                            </div>
+                            <img id="editImagePreview" style="max-width: 100%; display: block;">
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button type="button" class="btn-secondary" onclick="rotateImage('edit', -90)"><i class="fas fa-undo"></i> Xoay trái</button>
+                                <button type="button" class="btn-secondary" onclick="rotateImage('edit', 90)"><i class="fas fa-redo"></i> Xoay phải</button>
+                                <button type="button" class="btn-secondary" onclick="flipImage('edit', 'horizontal')"><i class="fas fa-arrows-alt-h"></i> Lật ngang</button>
+                                <button type="button" class="btn-secondary" onclick="flipImage('edit', 'vertical')"><i class="fas fa-arrows-alt-v"></i> Lật dọc</button>
+                                <button type="button" class="btn-secondary" onclick="resetCropper('edit')"><i class="fas fa-sync"></i> Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="editUrlTab" class="image-tab">
+                        <input type="url" id="editItemImageUrl" placeholder="https://example.com/image.jpg">
+                        <small style="color: #666; font-size: 0.85rem;">Để trống sẽ giữ nguyên ảnh hiện tại</small>
+                    </div>
                 </div>
                 <button type="submit" class="btn-primary btn-full">Update Item</button>
             </form>
