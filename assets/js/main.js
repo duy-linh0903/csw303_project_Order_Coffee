@@ -77,9 +77,9 @@ function getCustomizeOptions() {
         milkTypes: [
             { value: 'no-milk', label: 'No Milk', price: 0 },
             { value: 'regular', label: 'Regular Milk', price: 0 },
-            { value: 'soy', label: 'Soy Milk', price: 5000 },
-            { value: 'almond', label: 'Almond Milk', price: 8000 },
-            { value: 'oat', label: 'Oat Milk', price: 8000 }
+            { value: 'soy', label: 'Soy Milk', price: 3000 },
+            { value: 'almond', label: 'Almond Milk', price: 5000 },
+            { value: 'oat', label: 'Oat Milk', price: 5000 }
         ],
         extraShotPrice: 10000
     };
@@ -108,6 +108,18 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDetailTotal();
         }
     });
+});
+
+// Reload cart when page becomes visible (user returns from cart page)
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        loadCart();
+    }
+});
+
+// Reload cart when window gains focus
+window.addEventListener('focus', function() {
+    loadCart();
 });
 
 // Promotion Banner Slider
