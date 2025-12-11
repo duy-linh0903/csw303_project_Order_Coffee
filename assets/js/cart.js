@@ -985,15 +985,15 @@ function openCustomizeModal(index) {
                 <div class="option-group">
                     <label class="option-radio">
                         <input type="radio" name="size" value="Small" ${current.size === 'Small' ? 'checked' : ''}>
-                        <span>Small</span>
+                        <span>Small (-20%)</span>
                     </label>
                     <label class="option-radio">
                         <input type="radio" name="size" value="Medium" ${!current.size || current.size === 'Medium' ? 'checked' : ''}>
-                        <span>Medium (+12.500₫)</span>
+                        <span>Medium</span>
                     </label>
                     <label class="option-radio">
                         <input type="radio" name="size" value="Large" ${current.size === 'Large' ? 'checked' : ''}>
-                        <span>Large (+25.000₫)</span>
+                        <span>Large (+20%)</span>
                     </label>
                 </div>
             </div>
@@ -1058,15 +1058,15 @@ function openCustomizeModal(index) {
                     </label>
                     <label class="option-radio">
                         <input type="radio" name="milk" value="Soy Milk" ${current.milk === 'Soy Milk' ? 'checked' : ''}>
-                        <span>Soy Milk (+12.500₫)</span>
+                        <span>Soy Milk (+3.000₫)</span>
                     </label>
                     <label class="option-radio">
                         <input type="radio" name="milk" value="Almond Milk" ${current.milk === 'Almond Milk' ? 'checked' : ''}>
-                        <span>Almond Milk (+12.500₫)</span>
+                        <span>Almond Milk (+5.000₫)</span>
                     </label>
                     <label class="option-radio">
                         <input type="radio" name="milk" value="Oat Milk" ${current.milk === 'Oat Milk' ? 'checked' : ''}>
-                        <span>Oat Milk (+12.500₫)</span>
+                        <span>Oat Milk (+5.000₫)</span>
                     </label>
                 </div>
             </div>
@@ -1081,11 +1081,11 @@ function openCustomizeModal(index) {
                     </label>
                     <label class="option-radio">
                         <input type="radio" name="extraShots" value="1" ${current.extraShots === '1' ? 'checked' : ''}>
-                        <span>+1 Shot (+18.750₫)</span>
+                        <span>+1 Shot (+10.000₫)</span>
                     </label>
                     <label class="option-radio">
                         <input type="radio" name="extraShots" value="2" ${current.extraShots === '2' ? 'checked' : ''}>
-                        <span>+2 Shots (+37.500₫)</span>
+                        <span>+2 Shots (+20.000₫)</span>
                     </label>
                 </div>
             </div>
@@ -1124,11 +1124,18 @@ function saveCustomization() {
     const basePrice = cart[customizingIndex].price || 45000;
     let totalPrice = basePrice;
     
-    if (size === 'Medium') totalPrice += 12500;
-    if (size === 'Large') totalPrice += 25000;
-    if (milk === 'Soy Milk' || milk === 'Almond Milk' || milk === 'Oat Milk') totalPrice += 12500;
-    if (extraShots === '1') totalPrice += 18750;
-    if (extraShots === '2') totalPrice += 37500;
+    // Apply size multiplier
+    if (size === 'Small') totalPrice = basePrice * 0.8;
+    else if (size === 'Medium') totalPrice = basePrice * 1.0;
+    else if (size === 'Large') totalPrice = basePrice * 1.2;
+    
+    // Add milk price
+    if (milk === 'Soy Milk') totalPrice += 3000;
+    if (milk === 'Almond Milk' || milk === 'Oat Milk') totalPrice += 5000;
+    
+    // Add extra shots price
+    if (extraShots === '1') totalPrice += 10000;
+    if (extraShots === '2') totalPrice += 20000;
     
     // Update cart item
     cart[customizingIndex].customizations = {
