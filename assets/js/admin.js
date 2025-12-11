@@ -19,18 +19,18 @@ function initializeMenuItems() {
     } else {
         // Default menu items (same as in script.js)
         menuItems = [
-            { id: 1, name: 'Espresso', price: 87500, description: 'Rich and bold espresso shot', category: 'hot', image: 'linear-gradient(135deg, #6f4e37, #8B4513)' },
-            { id: 2, name: 'Cappuccino', price: 112500, description: 'Espresso with steamed milk foam', category: 'hot', image: 'linear-gradient(135deg, #8B4513, #A0522D)' },
-            { id: 3, name: 'Latte', price: 118750, description: 'Smooth espresso with steamed milk', category: 'hot', image: 'linear-gradient(135deg, #D2691E, #CD853F)' },
-            { id: 4, name: 'Americano', price: 93750, description: 'Espresso with hot water', category: 'hot', image: 'linear-gradient(135deg, #4B3621, #6F4E37)' },
-            { id: 5, name: 'Iced Coffee', price: 100000, description: 'Refreshing cold brewed coffee', category: 'iced', image: 'linear-gradient(135deg, #4682B4, #5F9EA0)' },
-            { id: 6, name: 'Iced Latte', price: 125000, description: 'Cold espresso with milk and ice', category: 'iced', image: 'linear-gradient(135deg, #87CEEB, #B0E0E6)' },
-            { id: 7, name: 'Cold Brew', price: 112500, description: 'Smooth cold brewed coffee', category: 'iced', image: 'linear-gradient(135deg, #2C3E50, #34495E)' },
-            { id: 8, name: 'Frappe', price: 137500, description: 'Blended iced coffee drink', category: 'iced', image: 'linear-gradient(135deg, #D4A574, #E8C39E)' },
-            { id: 9, name: 'Caramel Macchiato', price: 143750, description: 'Vanilla and caramel latte', category: 'special', image: 'linear-gradient(135deg, #D2691E, #F4A460)' },
-            { id: 10, name: 'Mocha', price: 131250, description: 'Chocolate and espresso blend', category: 'special', image: 'linear-gradient(135deg, #3E2723, #5D4037)' },
-            { id: 11, name: 'Vanilla Latte', price: 125000, description: 'Latte with vanilla syrup', category: 'special', image: 'linear-gradient(135deg, #F5DEB3, #FFE4B5)' },
-            { id: 12, name: 'Pumpkin Spice', price: 150000, description: 'Seasonal pumpkin spice latte', category: 'special', image: 'linear-gradient(135deg, #FF8C00, #FFA500)' }
+            { id: 1, name: 'Espresso', price: 35000, description: 'Rich and bold espresso shot', category: 'hot', image: 'linear-gradient(135deg, #6f4e37, #8B4513)' },
+            { id: 2, name: 'Cappuccino', price: 45000, description: 'Espresso with steamed milk foam', category: 'hot', image: 'linear-gradient(135deg, #8B4513, #A0522D)' },
+            { id: 3, name: 'Latte', price: 48000, description: 'Smooth espresso with steamed milk', category: 'hot', image: 'linear-gradient(135deg, #D2691E, #CD853F)' },
+            { id: 4, name: 'Americano', price: 38000, description: 'Espresso with hot water', category: 'hot', image: 'linear-gradient(135deg, #4B3621, #6F4E37)' },
+            { id: 5, name: 'Iced Coffee', price: 40000, description: 'Refreshing cold brewed coffee', category: 'iced', image: 'linear-gradient(135deg, #4682B4, #5F9EA0)' },
+            { id: 6, name: 'Iced Latte', price: 50000, description: 'Cold espresso with milk and ice', category: 'iced', image: 'linear-gradient(135deg, #87CEEB, #B0E0E6)' },
+            { id: 7, name: 'Cold Brew', price: 45000, description: 'Smooth cold brewed coffee', category: 'iced', image: 'linear-gradient(135deg, #2C3E50, #34495E)' },
+            { id: 8, name: 'Frappe', price: 55000, description: 'Blended iced coffee drink', category: 'iced', image: 'linear-gradient(135deg, #D4A574, #E8C39E)' },
+            { id: 9, name: 'Caramel Macchiato', price: 58000, description: 'Vanilla and caramel latte', category: 'special', image: 'linear-gradient(135deg, #D2691E, #F4A460)' },
+            { id: 10, name: 'Mocha', price: 53000, description: 'Chocolate and espresso blend', category: 'special', image: 'linear-gradient(135deg, #3E2723, #5D4037)' },
+            { id: 11, name: 'Vanilla Latte', price: 50000, description: 'Latte with vanilla syrup', category: 'special', image: 'linear-gradient(135deg, #F5DEB3, #FFE4B5)' },
+            { id: 12, name: 'Pumpkin Spice', price: 60000, description: 'Seasonal pumpkin spice latte', category: 'special', image: 'linear-gradient(135deg, #FF8C00, #FFA500)' }
         ];
         localStorage.setItem('menuItems', JSON.stringify(menuItems));
     }
@@ -1778,11 +1778,11 @@ const defaultCustomizeOptions = {
     milkTypes: [
         { value: 'no-milk', label: 'No Milk', price: 0 },
         { value: 'regular', label: 'Regular Milk', price: 0 },
-        { value: 'soy', label: 'Soy Milk', price: 5000 },
-        { value: 'almond', label: 'Almond Milk', price: 8000 },
-        { value: 'oat', label: 'Oat Milk', price: 8000 }
+        { value: 'soy', label: 'Soy Milk', price: 3000 },
+        { value: 'almond', label: 'Almond Milk', price: 5000 },
+        { value: 'oat', label: 'Oat Milk', price: 5000 }
     ],
-    extraShotPrice: 15000
+    extraShotPrice: 10000
 };
 
 // Get customize options from localStorage
