@@ -19,6 +19,7 @@ let customizingIndex = -1;
 document.addEventListener('DOMContentLoaded', function() {
     loadUserData();
     loadCart();
+    loadDeliveryInfoFromMain();
     renderCart();
     checkLoginStatus();
     setupEventListeners();
@@ -766,6 +767,45 @@ function toggleDeliveryOption() {
         const deliveryModal = document.getElementById('deliveryModal');
         const checkoutModal = document.getElementById('checkoutModal');
         
+        // Load and display saved delivery info if available
+        const savedInfo = loadSavedDeliveryInfo();
+        const savedDisplay = document.getElementById('savedAddressDisplay');
+        const formContainer = document.getElementById('deliveryForm');
+        const saveCheckboxContainer = document.getElementById('saveAddressCheckboxContainer');
+        
+        if (savedInfo && savedDisplay && formContainer) {
+            // Show saved address
+            const savedAddressText = document.getElementById('savedAddressText');
+            const savedNoteText = document.getElementById('savedNoteText');
+            
+            if (savedAddressText) savedAddressText.textContent = savedInfo.address;
+            if (savedNoteText) {
+                savedNoteText.textContent = savedInfo.note ? `Ghi chú: ${savedInfo.note}` : '';
+                savedNoteText.style.display = savedInfo.note ? 'block' : 'none';
+            }
+            
+            savedDisplay.style.display = 'block';
+            formContainer.style.display = 'none';
+            if (saveCheckboxContainer) saveCheckboxContainer.style.display = 'none';
+            
+            // Auto-fill delivery info
+            deliveryInfo = { address: savedInfo.address, note: savedInfo.note };
+        } else {
+            // Show form and auto-fill if saved info exists
+            if (savedDisplay) savedDisplay.style.display = 'none';
+            if (formContainer) formContainer.style.display = 'block';
+            if (saveCheckboxContainer) saveCheckboxContainer.style.display = 'block';
+            
+            // Auto-fill form fields
+            if (savedInfo) {
+                const addressInput = document.getElementById('deliveryAddress');
+                const noteInput = document.getElementById('deliveryNote');
+                
+                if (addressInput) addressInput.value = savedInfo.address;
+                if (noteInput) noteInput.value = savedInfo.note || '';
+            }
+        }
+        
         if (deliveryModal) deliveryModal.style.display = 'block';
         if (checkoutModal) checkoutModal.style.display = 'none';
     }
@@ -810,6 +850,7 @@ function submitDeliveryInfo(event) {
     
     const addressInput = document.getElementById('deliveryAddress');
     const noteInput = document.getElementById('deliveryNote');
+    const saveCheckbox = document.getElementById('saveAddressCheckboxForm');
 
     if (!addressInput) return;
 
@@ -822,8 +863,98 @@ function submitDeliveryInfo(event) {
     }
     
     deliveryInfo = { address, note };
+    
+    // Save to localStorage if checkbox is checked and user is logged in
+    if (saveCheckbox && saveCheckbox.checked && currentUser && !currentUser.isGuest) {
+        const savedDeliveryInfo = {
+            address: address,
+            note: note,
+            userEmail: currentUser.email,
+            savedAt: new Date().toISOString()
+        };
+        localStorage.setItem('savedDeliveryInfo_' + currentUser.email, JSON.stringify(savedDeliveryInfo));
+        showNotification('Đã lưu địa chỉ giao hàng');
+    }
+    
     closeDeliveryModal();
     showCheckoutModal();
+}
+
+// Load saved delivery info
+function loadSavedDeliveryInfo() {
+    if (!currentUser || currentUser.isGuest) return null;
+    
+    const saved = localStorage.getItem('savedDeliveryInfo_' + currentUser.email);
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            return null;
+        }
+    }
+    return null;
+}
+
+// Load delivery info from main menu
+function loadDeliveryInfoFromMain() {
+    // Check if delivery was initiated from main menu
+    const pendingDelivery = localStorage.getItem('pendingDelivery');
+    if (pendingDelivery === 'true') {
+        isDelivery = true;
+        
+        // Load current delivery info
+        const currentDeliveryInfo = localStorage.getItem('currentDeliveryInfo');
+        if (currentDeliveryInfo) {
+            try {
+                deliveryInfo = JSON.parse(currentDeliveryInfo);
+            } catch (e) {
+                deliveryInfo = null;
+            }
+        }
+        
+        // Auto-check delivery checkbox
+        const deliveryCheckbox = document.getElementById('deliveryCheckbox');
+        if (deliveryCheckbox) {
+            deliveryCheckbox.checked = true;
+        }
+        
+        // Clear the flags
+        localStorage.removeItem('pendingDelivery');
+        localStorage.removeItem('currentDeliveryInfo');
+    }
+}
+
+// Edit saved address
+function editSavedAddress() {
+    const savedDisplay = document.getElementById('savedAddressDisplay');
+    const formContainer = document.getElementById('deliveryForm');
+    const saveCheckboxContainer = document.getElementById('saveAddressCheckboxContainer');
+    
+    if (savedDisplay) savedDisplay.style.display = 'none';
+    if (formContainer) formContainer.style.display = 'block';
+    if (saveCheckboxContainer) saveCheckboxContainer.style.display = 'block';
+}
+
+// Confirm saved address
+function confirmSavedAddress() {
+    const savedInfo = loadSavedDeliveryInfo();
+    if (!savedInfo) return;
+    
+    deliveryInfo = { address: savedInfo.address, note: savedInfo.note };
+    closeDeliveryModal();
+    showCheckoutModal();
+    showNotification('Đã xác nhận địa chỉ giao hàng');
+}
+
+// Confirm saved address
+function confirmSavedAddress() {
+    const savedInfo = loadSavedDeliveryInfo();
+    if (!savedInfo) return;
+    
+    deliveryInfo = { address: savedInfo.address, note: savedInfo.note };
+    closeDeliveryModal();
+    showCheckoutModal();
+    showNotification('Đã xác nhận địa chỉ giao hàng');
 }
 
 // Place Order

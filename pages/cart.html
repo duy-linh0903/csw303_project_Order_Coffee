@@ -234,6 +234,52 @@
                 <span>Phí giao hàng: <strong style="color: var(--accent-color);">23.000₫</strong></span>
             </div>
             
+            <!-- Saved Address Display -->
+            <div id="savedAddressDisplay" style="display: none; margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 0.25rem;">
+                            <i class="fas fa-map-marker-alt"></i> Địa chỉ đã lưu
+                        </div>
+                        <div id="savedAddressText" style="color: #2c1810; line-height: 1.5;"></div>
+                        <div id="savedNoteText" style="color: #666; font-size: 0.9rem; margin-top: 0.25rem; font-style: italic;"></div>
+                    </div>
+                    <button type="button" onclick="editSavedAddress()" style="
+                        padding: 0.5rem 1rem;
+                        background: white;
+                        border: 2px solid var(--primary-color);
+                        color: var(--primary-color);
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        transition: all 0.3s;
+                        white-space: nowrap;
+                        margin-left: 1rem;
+                    ">
+                        <i class="fas fa-edit"></i> Sửa
+                    </button>
+                </div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" id="saveAddressCheckbox" checked style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-size: 0.95rem; color: #666;">Lưu địa chỉ này cho lần đặt hàng sau</span>
+                </label>
+                <button type="button" onclick="confirmSavedAddress()" style="
+                    width: 100%;
+                    margin-top: 1rem;
+                    padding: 0.75rem;
+                    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-size: 1rem;
+                ">
+                    <i class="fas fa-check-circle"></i> Xác nhận địa chỉ này
+                </button>
+            </div>
+            
             <form id="deliveryForm" onsubmit="submitDeliveryInfo(event)">
                 <div class="form-group">
                     <label for="deliveryAddress">
@@ -251,6 +297,12 @@
                         <span style="color: #999; font-weight: 400; margin-left: 0.25rem;">(tùy chọn)</span>
                     </label>
                     <textarea id="deliveryNote" placeholder="Ví dụ: Gọi điện trước khi giao, để trước cửa..." rows="2"></textarea>
+                </div>
+                <div class="form-group" id="saveAddressCheckboxContainer">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="saveAddressCheckboxForm" checked style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-size: 0.95rem;">Lưu địa chỉ này cho lần đặt hàng sau</span>
+                    </label>
                 </div>
                 <button type="submit" class="btn-primary btn-full">
                     <i class="fas fa-check-circle"></i> Xác nhận giao hàng
